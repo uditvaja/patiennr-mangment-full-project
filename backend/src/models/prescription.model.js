@@ -47,6 +47,10 @@ const prescriptionSchema = new mongoose.Schema({
   insurancePlan: { type: String },
   claimAmount: { type: Number },
   claimedAmount: { type: Number },
+  quantity: {
+    type: Number,
+    min: 1, // Quantity should be at least 1
+  },
   medicinePrices: { // New field to store the prices of medicines
     type: [Object],
     required: true, // Ensure this is always provided

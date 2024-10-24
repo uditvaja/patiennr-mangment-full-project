@@ -16,6 +16,43 @@ const DoctorAppointment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Change Invoice Theme",
+      description: "Lincoln Philips changed the Invoice Theme.",
+      time: "5 min ago",
+      icon: "theme-icon.svg",
+    },
+    {
+      id: 2,
+      title: "Dr.Bharat",
+      description: "Created a bill by Dr. Bharat.",
+      time: "5 min ago",
+      icon: "theme-icon.svg",
+    },
+    {
+      id: 3,
+      title: "Payment Received",
+      description: "24,668 is the payment done of Miracle Canter.",
+      time: "1:52PM",
+      icon: "payment-received-icon.svg",
+    },
+    {
+      id: 4,
+      title: "Payment Cancelled",
+      description: "24,668 is the payment cancelled of Miracle Canter.",
+      time: "1:52PM",
+      icon: "payment-cancelled-icon.svg",
+    },
+  ]);
+
+  const noNotificationImage = "/assets/images/no-notification.png";
+
+  const clearNotifications = () => {
+    setNotifications([]); // Clear the notifications array
+  };
+
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
@@ -57,39 +94,6 @@ const DoctorAppointment = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSidebarOpen]);
-
-  const notifications = [
-    {
-      id: 1,
-      title: "Change Invoice Theme",
-      description: "Lincoln Philips changed the Invoice Theme.",
-      time: "5 min ago",
-      icon: "theme-icon.svg",
-    },
-    {
-      id: 2,
-      title: "Dr.Bharat",
-      description: "Created a bill by Dr. Bharat.",
-      time: "5 min ago",
-      icon: "theme-icon.svg",
-    },
-    {
-      id: 3,
-      title: "Payment Received",
-      description: "24,668 is the payment done of Miracle Canter.",
-      time: "1:52PM",
-      icon: "payment-received-icon.svg",
-    },
-    {
-      id: 4,
-      title: "Payment Cancelled",
-      description: "24,668 is the payment cancelled of Miracle Canter.",
-      time: "1:52PM",
-      icon: "payment-cancelled-icon.svg",
-    },
-  ];
-
-  const noNotificationImage = "/assets/images/no-notification.png";
 
   const [appointments, setAppointments] = useState([
     {
@@ -273,7 +277,7 @@ const DoctorAppointment = () => {
                       <Dropdown.Menu className="notification-menu">
                         <div className="notification-header d-flex justify-content-between align-items-center">
                           <span>Notification</span>
-                          <button className="close-btn">&times;</button>
+                          <button className="close-btn" onClick={clearNotifications}>&times;</button>
                         </div>
                         {notifications.length > 0 ? (
                           notifications.map((notification) => (
@@ -346,7 +350,7 @@ const DoctorAppointment = () => {
                     <Dropdown.Menu className="notification-menu">
                       <div className="notification-header d-flex justify-content-between align-items-center">
                         <span>Notification</span>
-                        <button className="close-btn">&times;</button>
+                        <button className="close-btn" onClick={clearNotifications}>&times;</button>
                       </div>
                       {notifications.length > 0 ? (
                         notifications.map((notification) => (

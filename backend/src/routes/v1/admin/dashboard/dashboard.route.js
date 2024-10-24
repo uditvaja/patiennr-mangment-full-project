@@ -7,7 +7,7 @@ const router = express.Router();
 const { dashboardController } = require("../../../../controllers");
 const authenticAdmin = require("../../../../middlewares/adminAuth");
 
-
+ 
 /* -------------------------- CREATE/SIGNUP DOCTOR ----------- */
 
 // DOCTOR MANAGEMENT PANNEL

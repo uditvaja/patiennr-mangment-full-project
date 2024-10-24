@@ -52,7 +52,7 @@ const monitorBill = async (req, res) => {
         phoneNumber: bill.phoneNumber,
         BillDate: bill.BillDate,
         BillTime: bill.BillTime,
-        status: bill.is_active ? 'Active' : 'Inactive' // Determine status based on is_active field
+        status: bill.is_active ? 'Paid' : 'Unpaid' // Determine status based on is_active field
       }));
   
       // Return the list of formatted bills
@@ -134,11 +134,106 @@ const monitorBill = async (req, res) => {
       });
     }
   };
-  
-  
 
 
+// Update Bill Fields
+// const updateBill = async (billId, updateData) => {
+//   try {
+//     const updatedBill = await Bill.findByIdAndUpdate(billId, updateData, { new: true });
+//     console.log('Bill updated:', updatedBill);
+//   } catch (error) {
+//     console.error('Error updating bill:', error);
+//   }
+// };
+
+// // Update Hospital Fields
+// const updateHospital = async (hospitalId, updateData) => {
+//   try {
+//     const updatedHospital = await Hospital.findByIdAndUpdate(hospitalId, updateData, { new: true });
+//     console.log('Hospital updated:', updatedHospital);
+//   } catch (error) {
+//     console.error('Error updating hospital:', error);
+//   }
+// };
+
+// const updateHospitalLogo = async (hospitalId, imagePath) => {
+//   try {
+//     // Upload to Cloudinary
+//     const result = await cloudinary.uploader.upload(imagePath, {
+//       folder: 'hospital_logos',
+//     });
+
+//     // Update Hospital document with the new logo details
+//     const updatedHospital = await Hospital.findByIdAndUpdate(hospitalId, {
+//       'hospital_logo.public_id': result.public_id,
+//       'hospital_logo.url': result.secure_url,
+//     }, { new: true });
+
+//     console.log('Hospital logo updated:', updatedHospital);
+//   } catch (error) {
+//     console.error('Error updating hospital logo:', error);
+//   }
+// };
+
+
+
+
+const billView = async (req, res) => {
+  try {
+    const bills = await Bill.find(); // Fetch all records from the Bill collection
+    res.status(200).json(bills); // Send the bills data as a JSON response
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while fetching bills' });
+  }
+};
+
+  // const updateDocProfile = async (req, res) => {
+  //   try {
+  //     const reqbody = req.body;
   
+  //     // If there's a file uploaded, remove any existing image first
+  //     if (req.file) {
+  //       const user = await Bill.findById(reqbody.doctorId);
+  //       if(!user){
+  //         return res.status(401).json({status:401,success:false, message: "Doctor not found!"})
+  //       }
+  //       if (user && user.image) {
+  //         const imagePath = path.join(__dirname, "/../../../public/doctorImg", user.image);
+  //         if (fs.existsSync(imagePath)) {
+  //           fs.unlinkSync(imagePath);
+  //         } 
+  //       }
+  //       reqbody.image = req.file.filename;
+  //     }
+  
+  //     const user = await Doctor.findById(reqbody.doctorId);
+  
+  //     if (!user) {
+  //       throw new Error(` doctorId ${reqbody.doctorId} not found`);
+  //     }
+  //     // Concatenate first name and last name
+  //     const fullName = reqbody.first_name + " " + reqbody.last_name;
+  //     reqbody.name = fullName;
+  
+  //     // Update user data in the database
+  //     const isUpdate = await Doctor.findByIdAndUpdate(
+  //       reqbody.doctorId,
+  //       {
+  //         $set: reqbody,
+  //       },
+  //       { new: true }
+  //     );
+  //     res.status(200).json({
+  //       status: 200,
+  //       success: true,
+  //       updateData: isUpdate,
+  //       message: "Update profile successfully",
+  //     });
+  //   } catch (err) {
+  //     res.status(400).json({ success: false, error: err.message });
+  //   }
+  // };
+
   // updateHospitalAndBill = async (req, res) => {
   //   try {
   //     const { hospitalId, billId } = req.body; // Keep this
@@ -227,6 +322,8 @@ const monitorBill = async (req, res) => {
 module.exports = {
     createBill,
     monitorBill,
-    searchPatient,
+    searchPatient,billView
+    
+    // updateBill,updateHospital,updateHospitalLogo
     // updateHospitalAndBill
   };

@@ -10,7 +10,7 @@ const hospitalSchema = new mongoose.Schema({
  phoneNumber:{type:Number},
  email:{type:String},
  country:{
-   type:String, 
+   type:String,
  },
  state:{
    type:String,

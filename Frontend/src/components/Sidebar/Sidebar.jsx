@@ -33,7 +33,11 @@ const Sidebar = ({ isOpen, sidebarRef, activeLink }) => {
             <Link
               to={"/doctor-management"}
               className={`nav-link nav-links-2 ${
-                activeLink === "/doctor-management" || activeLink === "/add-new-doctor" || activeLink === "/edit-doctor/:id" ? "active" : ""
+                activeLink === "/doctor-management" ||
+                activeLink === "/add-new-doctor" ||
+                activeLink === "/edit-doctor/:id"
+                  ? "active"
+                  : ""
               }`}
             >
               Doctor Management
@@ -70,7 +74,17 @@ const Sidebar = ({ isOpen, sidebarRef, activeLink }) => {
                 <Link
                   to={"/billing/monitor-billing"}
                   className={`nav-link ${
-                    activeLink === "/billing/monitor-billing" || activeLink === "/billing/pandingbills" || activeLink === "/billing/monitor-billing/invoice" || activeLink === "/billing/monitor-billing/pending-invoice" || activeLink === "/createBill" ? "active" : ""
+                    activeLink === "/billing/monitor-billing" ||
+                    activeLink === "/billing/pandingbills" ||
+                    activeLink === "/billing/monitor-billing/invoice" ||
+                    activeLink === "/billing/monitor-billing/pending-invoice" ||
+                    activeLink ===
+                      "/billing/monitor-billing/invoice-create-bill/:templateId" ||
+                    activeLink === "/billing/monitor-billing/createBill" ||
+                    activeLink === "/billing/monitor-billing/editInvoice" ||
+                    activeLink === "/billing/monitor-billing/selectInvoiceTheme"
+                      ? "active"
+                      : ""
                   }`}
                 >
                   Monitor Billing
@@ -80,7 +94,10 @@ const Sidebar = ({ isOpen, sidebarRef, activeLink }) => {
                 <Link
                   to={"/billing/insurance-claims"}
                   className={`nav-link ${
-                    activeLink === "/billing/insurance-claims" ? "active" : ""
+                    activeLink === "/billing/insurance-claims" ||
+                    activeLink === "/billing/insurance-claims/Invoice"
+                      ? "active"
+                      : ""
                   }`}
                 >
                   Insurance Claims
@@ -90,7 +107,11 @@ const Sidebar = ({ isOpen, sidebarRef, activeLink }) => {
                 <Link
                   to={"/billing/payment-process"}
                   className={`nav-link ${
-                    activeLink === "/billing/payment-process" ? "active" : ""
+                    activeLink === "/billing/payment-process" ||
+                    activeLink === "/billing/payment-process/edit" ||
+                    activeLink === "/billing/payment-process/invoice"
+                      ? "active"
+                      : ""
                   }`}
                 >
                   Payment Process

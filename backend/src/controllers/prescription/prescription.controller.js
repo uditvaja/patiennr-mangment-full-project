@@ -5,28 +5,42 @@ const Prescription = require("../../models/prescription.model");
 /* ------------------------------- CREATE Hospital  ------------------------------- */
 const createPrescription = async (req, res) => {
   try {
-    const { medicinePrices } = req.body; // Assuming this contains an array of price objects
+    const { medicinePrices } = req.body; // Assuming this contains an array of medicine objects with price and quantity
 
-    // Calculate total price for all medicines
-    const overallTotalPrice = medicinePrices.reduce((acc, curr) => acc + curr.price, 0);
+    // Validate and filter out invalid entries in medicinePrices
+    if (!Array.isArray(medicinePrices) || medicinePrices.length === 0) {
+      throw new Error("Invalid medicinePrices array");
+    }
 
-    // Calculate total price for each medicine
+    // Calculate total price for all medicines, ensuring price and quantity are valid numbers
+    const overallTotalPrice = medicinePrices.reduce((acc, curr) => {
+      const price = parseFloat(curr.price);
+      const quantity = parseInt(curr.quantity, 10);
+
+      if (isNaN(price) || isNaN(quantity) || price < 0 || quantity < 0) {
+        throw new Error(`Invalid price or quantity for medicine: ${curr.medicineName}`);
+      }
+
+      return acc + (price * quantity);
+    }, 0);
+
+    // Calculate total price for each medicine (price * quantity)
     const medicineTotalPrices = medicinePrices.map(medicine => ({
       medicineName: medicine.medicineName,
-      totalPrice: medicine.price // You can customize this if you have quantities or other calculations
+      quantity: medicine.quantity,
+      totalPrice: medicine.price * medicine.quantity // Total price = price * quantity
     }));
 
     // Calculate claimAmount (e.g., 80% of the total price)
-    const claimAmount = overallTotalPrice * 0.8; // Change this percentage as per your requirement
-    // Calculate claimedAmount (initially set to 0 or could be the claimAmount)
-    const claimedAmount = 0; // Or you could set this to claimAmount if it's an initial claim
+    const claimAmount = overallTotalPrice * 0.8; // Adjust percentage as needed
+    const claimedAmount = 0; // Initially set to 0 or claimAmount if needed
 
     // Prepare the request body to save to the database
     const reqBody = {
       ...req.body,
       totalPrice: overallTotalPrice, // Include overall total price in the request body
       claimAmount, // Add the calculated claim amount
-      claimedAmount // Add the calculated claimed amount
+      claimedAmount, // Add the calculated claimed amount
     };
 
     // Create the prescription in the database
@@ -40,7 +54,7 @@ const createPrescription = async (req, res) => {
       status: 200,
       message: "Successfully created a new prescription",
       success: true,
-      medicineTotalPrices, // Include the total prices for each medicine
+      medicineTotalPrices, // Include total prices for each medicine
       overallTotalPrice,
       claimAmount, // Include the calculated claim amount
       claimedAmount, // Include the calculated claimed amount
@@ -50,6 +64,7 @@ const createPrescription = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 
 const getPrescriptionsByPatientId = async (req, res) => {

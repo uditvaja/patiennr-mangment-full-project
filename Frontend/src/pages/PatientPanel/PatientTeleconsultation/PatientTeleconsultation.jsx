@@ -101,7 +101,7 @@ const PatientTeleconsultation = () => {
     };
   }, [isSidebarOpen]);
 
-  const notifications = [
+  const [notifications, setNotifications] = useState([
     {
       id: 1,
       title: "Change Invoice Theme",
@@ -130,9 +130,13 @@ const PatientTeleconsultation = () => {
       time: "1:52PM",
       icon: "payment-cancelled-icon.svg",
     },
-  ];
+  ]);
 
   const noNotificationImage = "/assets/images/no-notification.png";
+
+  const clearNotifications = () => {
+    setNotifications([]); // Clear the notifications array
+  };
 
   const handleJoinClick = (appointment) => {
     setSelectedAppointment(appointment);
@@ -1067,7 +1071,7 @@ const PatientTeleconsultation = () => {
                       <Dropdown.Menu className="notification-menu">
                         <div className="notification-header d-flex justify-content-between align-items-center">
                           <span>Notification</span>
-                          <button className="close-btn">&times;</button>
+                          <button className="close-btn" onClick={clearNotifications}>&times;</button>
                         </div>
                         {notifications.length > 0 ? (
                           notifications.map((notification) => (
@@ -1140,7 +1144,7 @@ const PatientTeleconsultation = () => {
                     <Dropdown.Menu className="notification-menu">
                       <div className="notification-header d-flex justify-content-between align-items-center">
                         <span>Notification</span>
-                        <button className="close-btn">&times;</button>
+                        <button className="close-btn" onClick={clearNotifications}>&times;</button>
                       </div>
                       {notifications.length > 0 ? (
                         notifications.map((notification) => (
