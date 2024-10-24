@@ -4,6 +4,7 @@ import DeleteDoctorModal from "../../../components/modals/DeleteDoctorModal";
 import DoctorDetailsDrawer from "../../../components/Drawer/DoctorDetailsDrawer";
 import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar/Sidebar";
+import axios from "axios";
 import "./DoctorManagement.scss";
 
 const DoctorManagement = () => {
@@ -13,6 +14,8 @@ const DoctorManagement = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -107,129 +110,42 @@ const DoctorManagement = () => {
     setOpenDeleteModal(false);
   };
 
-  const doctors = [
-    {
-      id: 1,
-      name: "Dr. Marcus Philips",
-      gender: "male-gender.png",
-      qualification: "MBBS",
-      specialty: "Internal Medicine",
-      workingTime: "6 Hour",
-      checkupTime: "4 Hour",
-      breakTime: "1 Hour",
-      age: "36 Years",
-      email: "kenzi.lawson@example.com",
-      phone: "89564 25462",
-      consultationRate: "₹ 1,000",
-      country: "India",
-      state: "Gujarat",
-      city: "Gandhinagar",
-      zipCode: "382002",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      signature: "/assets/images/signature.png",
-      profilePicture: "/assets/images/Avatar-2.png",
-      status: "Onsite",
-    },
-    {
-      id: 2,
-      name: "Dr. Sophia Patel",
-      gender: "female-gender.png",
-      qualification: "MD",
-      specialty: "Pediatrics",
-      workingTime: "5 Hour",
-      checkupTime: "3 Hour",
-      breakTime: "30 Minutes",
-      age: "32 Years",
-      email: "sophia.patel@example.com",
-      phone: "98765 43210",
-      consultationRate: "₹ 800",
-      country: "India",
-      state: "Maharashtra",
-      city: "Mumbai",
-      zipCode: "400001",
-      address: "A-101, Rosewood Apartments, Andheri East.",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      signature: "/assets/images/signature.png",
-      profilePicture: "/assets/images/Avatar-2.png",
-      status: "Online",
-      hospitalName: "Artemis Hospital",
-      website: "https://sample.edu/railway",
-      emergencyContact: "48555-20103",
-      hospitalAddress:
-        "151-152 ,gopinath doc, manik chowk, Satelight road, Mota varacha Jamnagar.",
-    },
-    {
-      id: 3,
-      name: "Dr. Emma Taylor",
-      gender: "female-gender.png",
-      qualification: "MS",
-      specialty: "Gynecology",
-      workingTime: "7 Hour",
-      checkupTime: "5 Hour",
-      breakTime: "1.5 Hours",
-      age: "40 Years",
-      email: "emma.taylor@example.com",
-      phone: "12345 67890",
-      consultationRate: "₹ 1,200",
-      country: "India",
-      state: "Karnataka",
-      city: "Bengaluru",
-      zipCode: "560001",
-      address: "C-202, Silver Oak Apartments, Koramangala.",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      signature: "/assets/images/signature.png",
-      profilePicture: "/assets/images/Avatar-2.png",
-    },
-    {
-      id: 4,
-      name: "Dr. Liam Brown",
-      gender: "male-gender.png",
-      qualification: "MBBS",
-      specialty: "Orthopedics",
-      workingTime: "6 Hour",
-      checkupTime: "4 Hour",
-      breakTime: "1 Hour",
-      age: "35 Years",
-      email: "liam.brown@example.com",
-      phone: "45678 90123",
-      consultationRate: "₹ 900",
-      country: "India",
-      state: "Tamil Nadu",
-      city: "Chennai",
-      zipCode: "600001",
-      address: "D-101, Greenwood Apartments, Adyar.",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      signature: "/assets/images/signature.png",
-      profilePicture: "/assets/images/Avatar-2.png",
-    },
-    {
-      id: 5,
-      name: "Dr. Ava Lee",
-      gender: "female-gender.png",
-      qualification: "MD",
-      specialty: "Cardiology",
-      workingTime: "7 Hour",
-      checkupTime: "5 Hour",
-      breakTime: "1.5 Hours",
-      age: "38 Years",
-      email: "ava.lee@example.com",
-      phone: "65432 10987",
-      consultationRate: "₹ 1,100",
-      country: "India",
-      state: "Delhi",
-      city: "New Delhi",
-      zipCode: "110001",
-      address: "E-101, Park View Apartments, Vasant Kunj.",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      signature: "/assets/images/signature.png",
-      profilePicture: "/assets/images/Avatar-2.png",
-    },
-  ];
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      if (searchTerm.length < 2) {
+        setDoctors([]); // Clear results if search term is too short
+        return;
+      }
+      
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await axios.get(
+          `http://localhost:9500/v1/dashboard-admin/search-doctor-and-patient-list?query=${searchTerm}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the headers
+            },
+          }
+        );
+        
+        setDoctors(response.data.searchResults); // Assume API response has doctors in "doctors" field
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [searchTerm]); // Fetch new results when searchTerm changes
 
   // Filter doctors based on the search term
   const filteredDoctors = doctors.filter((doctor) =>
-    doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
+    doctor.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doctor.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -484,7 +400,9 @@ const DoctorManagement = () => {
 
           {/* Table */}
           <div className="table-responsive">
-            {filteredDoctors.length === 0 ? (
+          {loading ? (
+              <div className="text-center">Loading...</div>
+            ) : filteredDoctors.length === 0 ? (
               <div className="text-center">
                 <img
                   src="/assets/images/no-doctor-found-2.png"
@@ -519,16 +437,16 @@ const DoctorManagement = () => {
                     <tr key={index}>
                       <td>
                         <img
-                          src={doctor.profilePicture}
-                          alt={doctor.name}
+                          src={doctor.image}
+                          alt={doctor.firstName}
                           className="me-3 img-fluid profile_img"
                         />
-                        {doctor.name}
+                        {doctor.firstName}
                       </td>
                       <td>
                         <img
                           src={`./assets/images/${doctor.gender}`}
-                          alt={doctor.name}
+                          alt={doctor.firstName}
                           style={{
                             width: "30px",
                             height: "30px",
@@ -538,19 +456,49 @@ const DoctorManagement = () => {
                         />
                       </td>
                       <td>{doctor.qualification}</td>
-                      <td>{doctor.specialty}</td>
-                      <td><div className="date-box">{doctor.workingTime}</div></td>
-                      <td><div className="date-box">{doctor.checkupTime}</div></td>
-                      <td><div className="date-box">{doctor.breakTime}</div></td>
+                      <td>{doctor.specialistType}</td>
+                      <td>
+                        <div className="date-box">{doctor.workingTime}</div>
+                      </td>
+                      <td>
+                        <div className="date-box">{doctor.patientCheckUpTime}</div>
+                      </td>
+                      <td>
+                        <div className="date-box">{doctor.breakTime}</div>
+                      </td>
                       <td className="d-flex">
-                        <button type="button" className="edit-button me-3 bg-transparent" onClick={() => navigate(`/edit-doctor/${doctor.id}`)}>
-                            <img src="/assets/images/edit-icon-box.svg" alt="edit-icon-box" className="img-fluid" />
+                        <button
+                          type="button"
+                          className="edit-button me-3 bg-transparent"
+                          onClick={() => navigate(`/edit-doctor/${doctor.id}`)}
+                        >
+                          <img
+                            src="/assets/images/edit-icon-box.svg"
+                            alt="edit-icon-box"
+                            className="img-fluid"
+                          />
                         </button>
-                        <button type="button" className="view-button me-3 bg-transparent" onClick={() => handleDrawerOpen(doctor)}>
-                            <img src="/assets/images/view-icon-box.svg" alt="view-icon-box" className="img-fluid" />
+                        <button
+                          type="button"
+                          className="view-button me-3 bg-transparent"
+                          onClick={() => handleDrawerOpen(doctor)}
+                        >
+                          <img
+                            src="/assets/images/view-icon-box.svg"
+                            alt="view-icon-box"
+                            className="img-fluid"
+                          />
                         </button>
-                        <button type="button" className="delete-button bg-transparent" onClick={() => handleDeleteClick(doctor)}>
-                            <img src="/assets/images/delete-icon-box.svg" alt="delete-icon-box" className="img-fluid" />
+                        <button
+                          type="button"
+                          className="delete-button bg-transparent"
+                          onClick={() => handleDeleteClick(doctor)}
+                        >
+                          <img
+                            src="/assets/images/delete-icon-box.svg"
+                            alt="delete-icon-box"
+                            className="img-fluid"
+                          />
                         </button>
                       </td>
                     </tr>

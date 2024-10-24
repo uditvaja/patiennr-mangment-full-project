@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AuthSlider from "../../../components/auth-slider/AuthSlider";
 import "./register.scss";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -14,7 +14,19 @@ const Register = () => {
   const [countries, setCountries] = useState([]); // For all countries
   const [states, setStates] = useState([]); // For states based on selected country
   const [cities, setCities] = useState([]); // For cities based on selected state
-  const [hospitals, setHospitals] = useState([]); // For hospitals list
+  const [hospitals, setHospitals] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const [selectedHospital, setSelectedHospital] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [newHospital, setNewHospital] = useState({
+    hospital_name: "",
+    hospital_address: "",
+    country: "",
+    state: "",
+    city: "",
+    zip_code: "",
+  });
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () =>
@@ -67,10 +79,19 @@ const Register = () => {
     }
   };
 
+  const fetchHospitals = async () => {
+    try {
+      const response = await axios.get('http://localhost:9500/v1/hospital/create-hospital');
+      setHospitals(response.data.data);
+    } catch (error) {
+      console.error('Error fetching hospitals:', error);
+    }
+  };
+
   // Fetch countries and states on component mount
   useEffect(() => {
     fetchCountriesAndStates();
-    fetchHospitals(); // Fetch hospitals list
+    fetchHospitals();
   }, []);
 
   const fetchCountriesAndStates = async () => {
@@ -105,14 +126,47 @@ const Register = () => {
     }
   };
 
-  const fetchHospitals = async () => {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleHospitalSelect = (hospitalId, hospitalName) => {
+    setSelectedHospital(hospitalName);
+    setFieldValue("hospitalId", hospitalId);
+    setShowDropdown(false);
+  };
+
+  const handleCreateHospital = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.get(
-        "http://localhost:9500/v1/hospital/get-hospitals"
+      const response = await axios.post(
+        "http://localhost:9500/v1/hospital/create-hospital",
+        newHospital
       );
-      setHospitals(response.data.data);
+
+      if (response.status === 201 || response.status === 200) {
+        await fetchHospitals();
+        setShowModal(false);
+        setNewHospital({
+          hospital_name: "",
+          hospital_address: "",
+          country: "",
+          state: "",
+          city: "",
+          zip_code: "",
+        });
+      }
     } catch (error) {
-      console.error("Error fetching hospitals:", error);
+      console.error("Error creating hospital:", error);
     }
   };
 
@@ -137,17 +191,17 @@ const Register = () => {
                         <div className="form-floating">
                           <Field
                             type="text"
-                            name="firstName"
+                            name="first_name"
                             className={`form-control ${
-                              errors.firstName && touched.firstName
+                              errors.first_name && touched.first_name
                                 ? "is-invalid"
                                 : ""
                             }`}
                             placeholder="First Name"
                           />
-                          <label htmlFor="firstName">Enter First Name</label>
+                          <label htmlFor="first_name">Enter First Name</label>
                           <ErrorMessage
-                            name="firstName"
+                            name="first_name"
                             component="div"
                             className="invalid-feedback"
                           />
@@ -157,17 +211,17 @@ const Register = () => {
                         <div className="form-floating">
                           <Field
                             type="text"
-                            name="lastName"
+                            name="last_name"
                             className={`form-control ${
-                              errors.lastName && touched.lastName
+                              errors.last_name && touched.last_name
                                 ? "is-invalid"
                                 : ""
                             }`}
                             placeholder="Last Name"
                           />
-                          <label htmlFor="lastName">Enter Last Name</label>
+                          <label htmlFor="last_name">Enter Last Name</label>
                           <ErrorMessage
-                            name="lastName"
+                            name="last_name"
                             component="div"
                             className="invalid-feedback"
                           />
@@ -199,17 +253,17 @@ const Register = () => {
                         <div className="form-floating">
                           <Field
                             type="text"
-                            name="phoneNumber"
+                            name="phone_number"
                             className={`form-control ${
-                              errors.phoneNumber && touched.phoneNumber
+                              errors.phone_number && touched.phone_number
                                 ? "is-invalid"
                                 : ""
                             }`}
                             placeholder="Phone Number"
                           />
-                          <label htmlFor="phoneNumber">Phone Number</label>
+                          <label htmlFor="phone_number">Phone Number</label>
                           <ErrorMessage
-                            name="phoneNumber"
+                            name="phone_number"
                             component="div"
                             className="invalid-feedback"
                           />
@@ -302,28 +356,46 @@ const Register = () => {
                     </div>
 
                     {/* Hospital Field */}
-                    <div className="form-floating mb-3">
-                      <Field
-                        as="select"
-                        name="hospital"
-                        className={`form-select ${
-                          errors.hospital && touched.hospital
-                            ? "is-invalid"
-                            : ""
-                        }`}
-                      >
-                        <option value="">Select Hospital</option>
-                        {hospitals.map((hospital) => (
-                          <option key={hospital._id} value={hospital._id}>
-                            {hospital.hospital_name}
-                          </option>
-                        ))}
-                      </Field>
-                      <ErrorMessage
-                        name="hospital"
-                        component="div"
-                        className="invalid-feedback"
+                    <div className="form-floating mb-3" ref={dropdownRef}>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Select Hospital"
+                        value={selectedHospital}
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        readOnly
                       />
+                      <label>Select Hospital</label>
+
+                      {/* Dropdown Menu */}
+                      {showDropdown && (
+                        <div className="custom-dropdown">
+                          {hospitals.map((hospital) => (
+                            <div
+                              key={hospital._id}
+                              className="dropdown-item"
+                              onClick={() =>
+                                handleHospitalSelect(
+                                  hospital._id,
+                                  hospital.hospital_name
+                                )
+                              }
+                            >
+                              {hospital.hospital_name}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            className="create-hospital-btn"
+                            onClick={() => {
+                              setShowModal(true);
+                              setShowDropdown(false);
+                            }}
+                          >
+                            Create Hospital
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Password */}
@@ -408,21 +480,16 @@ const Register = () => {
                     <div className="form-check mb-3">
                       <Field
                         type="checkbox"
-                        name="agreeToTerms"
+                        name="agree"
                         className={`form-check-input ${
-                          errors.agreeToTerms && touched.agreeToTerms
-                            ? "is-invalid"
-                            : ""
+                          errors.agree && touched.agree ? "is-invalid" : ""
                         }`}
                       />
-                      <label
-                        htmlFor="agreeToTerms"
-                        className="form-check-label"
-                      >
+                      <label htmlFor="agree" className="form-check-label">
                         I agree to the terms and conditions
                       </label>
                       <ErrorMessage
-                        name="agreeToTerms"
+                        name="agree"
                         component="div"
                         className="invalid-feedback"
                       />
@@ -447,6 +514,144 @@ const Register = () => {
           </div>
         </div>
       </div>
+      {/* Create Hospital Modal */}
+      {showModal && (
+        <div className="modal d-block" tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Hospital Name</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleCreateHospital}>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Hospital Name"
+                      value={newHospital.hospital_name}
+                      onChange={(e) =>
+                        setNewHospital({
+                          ...newHospital,
+                          hospital_name: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Hospital Address"
+                      value={newHospital.hospital_address}
+                      onChange={(e) =>
+                        setNewHospital({
+                          ...newHospital,
+                          hospital_address: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="row mb-3">
+                    <div className="col-6">
+                      <select
+                        className="form-select"
+                        value={newHospital.country}
+                        onChange={(e) =>
+                          setNewHospital({
+                            ...newHospital,
+                            country: e.target.value,
+                          })
+                        }
+                        required
+                      >
+                        <option value="">Select Country</option>
+                        <option value="india">India</option>
+                        {/* Add country options */}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <select
+                        className="form-select"
+                        value={newHospital.state}
+                        onChange={(e) =>
+                          setNewHospital({
+                            ...newHospital,
+                            state: e.target.value,
+                          })
+                        }
+                        required
+                      >
+                        <option value="">Select State</option>
+                        <option value="gujarat">Gujarat</option>
+                        {/* Add state options */}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="row mb-3">
+                    <div className="col-6">
+                      <select
+                        className="form-select"
+                        value={newHospital.city}
+                        onChange={(e) =>
+                          setNewHospital({
+                            ...newHospital,
+                            city: e.target.value,
+                          })
+                        }
+                        required
+                      >
+                        <option value="">Select City</option>
+                        <option value="surat">Surat</option>
+                        {/* Add city options */}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Zip Code"
+                        value={newHospital.zip_code}
+                        onChange={(e) =>
+                          setNewHospital({
+                            ...newHospital,
+                            zip_code: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="modal-footer px-0 pb-0">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </div>
+      )}
     </section>
   );
 };

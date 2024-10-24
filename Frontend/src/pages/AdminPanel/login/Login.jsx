@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Login.scss";
 import { loginValidationSchema } from "../../../validation/AuthValidation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +33,11 @@ const Login = () => {
        
         const token = response.data.token;
         localStorage.setItem('token', token); 
-        setError(null); // Clear error state
-        navigate('/'); 
+        setError(null);
+        toast.success(response.message);
+        setTimeout(() => {
+          navigate('/'); // Navigate after delay
+        }, 2000); 
       }
     } catch (err) {
       // Handle login error
