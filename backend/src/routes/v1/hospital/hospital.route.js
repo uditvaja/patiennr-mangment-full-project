@@ -11,6 +11,7 @@ const {  hospitalController } = require("../../../controllers");
 /* -------------------------- CREATE/SIGNUP DOCTOR ----------- */
 router.post("/create-hospital", hospitalController.createHospital);
 
-
+router.get('/get-hospitals',hospitalController.getHospitals);
+router.post('/get-hospital-by-id',hospitalController.getHospitalById);
 
 module.exports = router;

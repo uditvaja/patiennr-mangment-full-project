@@ -3,24 +3,31 @@ import Sidebar from "../../../components/Sidebar/Sidebar";
 import { Dropdown } from "react-bootstrap";
 import "./AdminProfile.scss";
 import { useLocation } from "react-router-dom";
-
+import axios from "axios";
 const AdminProfile = () => {
+  const [oldPass, setOldPass] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
   const [activeSection, setActiveSection] = useState("profile");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const [showPassword3, setShowPassword3] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const token = localStorage.getItem("token");
+  console.log(token);
+  
   const [profileData, setProfileData] = useState({
-    firstName: "Lincoln",
-    lastName: "Philips",
-    emailAddress: "Lincoln@gmail.com",
-    phoneNumber: "99130 53222",
-    hospitalName: "Silver Park Medical Center",
-    gender: "Male",
-    city: "Ahmedabad",
-    state: "Gujarat",
-    country: "India",
+    first_Name: "",
+    lastName: "",
+    emailAddress: "",
+    phoneNumber: "",
+    hospitalId: "",
+    gender: "",
+    city: "",
+    state: "",
+    country: "",
+    _id: "",
   });
   const [profileImage, setProfileImage] = useState(
     "./assets/images/profile-2.png"
@@ -28,6 +35,7 @@ const AdminProfile = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
   const sidebarRef = useRef(null);
+  const [hospitalName, setHospitalName] = useState("");
   const location = useLocation();
 
   const togglePasswordVisibility = () => {
@@ -98,10 +106,96 @@ const AdminProfile = () => {
       setProfileImage(imagePreview);
     }
   };
+  const adminId = profileData._id;
+  console.log(adminId);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Validate passwords
+    if (newPass !== confirmPass) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:9500/v1/admin/change-password",
+        {
+          oldpass: oldPass,
+          newpass: newPass,
+          confirmpass: confirmPass,
+          adminId: adminId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Passing the token in headers
+          }
+        }
+      );
+  
+      console.log("Response received:", response); // Debug the full response
+  
+      if (response?.data?.success) {
+        alert("Password changed successfully!");
+      } else {
+        // Handle the case when the response does not contain expected data
+        alert("Failed to change password: " + (response?.data?.message || "Unknown error"));
+      }
+    } catch (error) {
+      // In case of an error, log it and show an error message
+      console.error("Error occurred:", error);
+      alert("Error changing password: " + (error.response?.data?.message || error.message));
+    }
+  };
+  const fetchHospitalData = async (hospitalId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:9500/v1/hospital/get-hospital-by-id",
+        { id: hospitalId }
+      );
+console.log(response.data.data.hospital_name);
+
+      if (response?.data?.success) {
+        setHospitalName(response.data.data.hospital_name); // Assuming the response contains a hospitalName
+      } else {
+        console.error("Failed to fetch hospital data: " + (response?.data?.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error fetching hospital data:", error);
+    }
+  };
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
+    const storedData = localStorage.getItem("admin");
+    if (storedData) {
+      const data = JSON.parse(storedData); 
+      console.log(data);
+      
+      // Set the profile data state with the retrieved data
+      setProfileData({
+        first_name: data.first_name || "",
+        last_name: data.last_name || "",
+        email: data.email || "",
+        phone_number: data.phone_number || "",
+            hospitalId: data.hospitalId || "",
+        gender: data.gender || "",
+        city: data.city || "",
+        state: data.state || "",
+        country: data.country || "",
+        _id: data._id || "",
+      });
+      if (data.hospitalId) {
+        fetchHospitalData(data.hospitalId);
+      }
+    
+      // Optionally set a profile image if available
+      if (data.profileImage) {
+        setProfileImage(data.profileImage);
+      }
+    }
 
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -111,7 +205,7 @@ const AdminProfile = () => {
     {
       id: 1,
       title: "Change Invoice Theme",
-      description: "Lincoln Philips changed the Invoice Theme.",
+      description: "udit Philips changed the Invoice Theme.",
       time: "5 min ago",
       icon: "theme-icon.svg",
     },
@@ -137,8 +231,8 @@ const AdminProfile = () => {
       icon: "payment-cancelled-icon.svg",
     },
   ];
-
-  const noNotificationImage = "/assets/images/no-notification.png";
+ 
+  const noNotificationImage = "./assets/images/no-notification.png";
 
   return (
     <>
@@ -160,7 +254,7 @@ const AdminProfile = () => {
                       <li className="breadcrumb-item">
                         <a href="#">
                           <img
-                            src="/assets/images/home-2.svg"
+                            src="./assets/images/home-2.svg"
                             alt="Home"
                             className="breadcrumb-icon"
                           />
@@ -183,7 +277,7 @@ const AdminProfile = () => {
                       placeholder="Quick Search"
                     />
                     <img
-                      src="/assets/images/search.svg"
+                      src="./assets/images/search.svg"
                       alt="search"
                       className="search-icon"
                     />
@@ -207,7 +301,7 @@ const AdminProfile = () => {
                   <div className="d-flex align-items-center justify-content-center">
                   <button className="btn" onClick={toggleSearch}>
                     <img
-                      src="/assets/images/search.svg"
+                      src="./assets/images/search.svg"
                       alt="search"
                       className="search-icon"
                     />
@@ -226,7 +320,7 @@ const AdminProfile = () => {
                       className="notification-toggle"
                     >
                       <img
-                        src="/assets/images/notification-bing.svg"
+                        src="./assets/images/notification-bing.svg"
                         alt="Notification Icon"
                         className="img-fluid"
                       />
@@ -244,7 +338,7 @@ const AdminProfile = () => {
                             className="notification-item d-flex align-items-start"
                           >
                             <img
-                              src={`/assets/images/${notification.icon}`}
+                              src={`./assets/images/${notification.icon}`}
                               alt={notification.title}
                               className="notification-icon"
                             />
@@ -272,12 +366,12 @@ const AdminProfile = () => {
                     <Dropdown.Toggle variant="link" id="dropdown-user">
                       <div className="d-flex align-items-center">
                         <img
-                          src="/assets/images/profile.png"
-                          alt="Lincoln Philips"
+                          src="./assets/images/profile.png"
+                          alt="udit Philips"
                           className="profile-pic img-fluid"
                         />
                         <div className="d-none text-start">
-                          <h3 className="user-name mb-0">Lincoln Philips</h3>
+                          <h3 className="user-name mb-0">{profileData.first_Name}</h3>
                           <span className="user-role">Admin</span>
                         </div>
                       </div>
@@ -297,7 +391,7 @@ const AdminProfile = () => {
                         className="notification-toggle"
                       >
                         <img
-                          src="/assets/images/notification-bing.svg"
+                          src="./assets/images/notification-bing.svg"
                           alt="Notification Icon"
                           className="img-fluid"
                         />
@@ -315,7 +409,7 @@ const AdminProfile = () => {
                               className="notification-item d-flex align-items-start"
                             >
                               <img
-                                src={`/assets/images/${notification.icon}`}
+                                src={`./assets/images/${notification.icon}`}
                                 alt={notification.title}
                                 className="notification-icon"
                               />
@@ -343,12 +437,12 @@ const AdminProfile = () => {
                       <Dropdown.Toggle variant="link" id="dropdown-user">
                         <div className="d-flex align-items-center">
                           <img
-                            src="/assets/images/profile.png"
-                            alt="Lincoln Philips"
+                            src="./assets/images/profile.png"
+                            alt="udit Philips"
                             className="profile-pic img-fluid"
                           />
                           <div className="d-block text-start">
-                            <h3 className="user-name mb-0">Lincoln Philips</h3>
+                            <h3 className="user-name mb-0">{profileData.first_Name}</h3>
                             <span className="user-role">Admin</span>
                           </div>
                         </div>
@@ -396,7 +490,7 @@ const AdminProfile = () => {
                             </div>
                           ) : (
                             <h5 className="profile-username">
-                              {profileData.firstName} {profileData.lastName}
+                              {profileData.first_Name} {profileData.lastName}
                             </h5>
                           )}
                         </div>
@@ -464,319 +558,235 @@ const AdminProfile = () => {
                       </div>
                       <div className="col-lg-9 col-md-6 col-12">
                         {/* Profile Section */}
-                        <div
-                          className={`collapse ${
-                            activeSection === "profile" ? "show" : ""
-                          }`}
-                          id="profile"
-                        >
-                          <div className="p-lg-4 p-0">
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                              <h4 className="admin-title">Profile</h4>
-                              <button
-                                onClick={handleEditProfile}
-                                className="edit-btn"
-                              >
-                                <img
-                                  src="./assets/images/edit.svg"
-                                  alt="edit"
-                                  className="img-fluid me-2"
-                                />
-                                Edit Profile
-                              </button>
-                            </div>
-                            <form>
-                              <div className="row">
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="firstName"
-                                      className={"form-control"}
-                                      id="FirstName"
-                                      placeholder="First Name"
-                                      value={profileData.firstName}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="FirstName">
-                                      First Name
-                                    </label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="lastName"
-                                      className={"form-control"}
-                                      id="LastName"
-                                      placeholder="Last Name"
-                                      value={profileData.lastName}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="LastName">Last Name</label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="phoneNumber"
-                                      className={"form-control"}
-                                      id="PhoneNumber"
-                                      placeholder="Phone Number"
-                                      value={profileData.phoneNumber}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="PhoneNumber">
-                                      Phone Number
-                                    </label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="hospitalName"
-                                      className={"form-control"}
-                                      id="HospitalName"
-                                      placeholder="Hospital Name"
-                                      value={profileData.hospitalName}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="HospitalName">
-                                      Hospital Name
-                                    </label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="gender"
-                                      className={"form-control"}
-                                      id="Gender"
-                                      placeholder="Gender"
-                                      value={profileData.gender}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="Gender">Gender</label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="email"
-                                      name="emailAddress"
-                                      className={"form-control"}
-                                      id="EmailAddress"
-                                      placeholder="Email Address"
-                                      value={profileData.emailAddress}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="EmailAddress">
-                                      Email Address
-                                    </label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="city"
-                                      className={"form-control"}
-                                      id="City"
-                                      placeholder="City"
-                                      value={profileData.city}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="City">City</label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="state"
-                                      className={"form-control"}
-                                      id="State"
-                                      placeholder="State"
-                                      value={profileData.state}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="State">State</label>
-                                  </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6 mb-3">
-                                  <div className="form-floating mb-3">
-                                    <input
-                                      type="text"
-                                      name="country"
-                                      className={"form-control"}
-                                      id="Country"
-                                      placeholder="Country"
-                                      value={profileData.country}
-                                      onChange={handleInputChange}
-                                      disabled={!isEditable}
-                                    />
-                                    <label htmlFor="Country">Country</label>
-                                  </div>
-                                </div>
-                              </div>
-                              {isEditable && (
-                                <div className="d-flex justify-content-end">
-                                  <button
-                                    type="button"
-                                    className="close-btn me-3"
-                                  >
-                                    Close
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="edit-admin-btn"
-                                    onClick={handleSaveProfile}
-                                  >
-                                    Save
-                                  </button>
-                                </div>
-                              )}
-                            </form>
-                          </div>
-                        </div>
+                        <div className={`collapse ${activeSection === "profile" ? "show" : ""}`} id="profile">
+        <div className="p-lg-4 p-0">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h4 className="admin-title">Profile</h4>
+            <button onClick={handleEditProfile} className="edit-btn">
+              <img src="./assets/images/edit.svg" alt="edit" className="img-fluid me-2" />
+              Edit Profile
+            </button>
+          </div>
+          <form>
+            <div className="row">
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="first_name"
+                    className={"form-control"}
+                    id="FirstName"
+                    placeholder="First Name"
+                    value={profileData.first_name}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="FirstName">First Name</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="last_name"
+                    className={"form-control"}
+                    id="LastName"
+                    placeholder="Last Name"
+                    value={profileData.last_name}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="LastName">Last Name</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="phone_number"
+                    className={"form-control"}
+                    id="PhoneNumber"
+                    placeholder="Phone Number"
+                    value={profileData.phone_number}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="PhoneNumber">Phone Number</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                <input
+                    type="text"
+                    className={"form-control"}
+                    id="HospitalName"
+                    placeholder="Hospital Name"
+                    value={hospitalName} // Display the fetched hospital name
+                    disabled
+                  />
+                  <label htmlFor="HospitalName">Hospital Name</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                <input
+                    type="text"
+                    name="gender"
+                    className={"form-control"}
+                    id="Gender"
+                    placeholder="Gender"
+                    value="male"
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="Gender">Gender</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="email"
+                    name="email"
+                    className={"form-control"}
+                    id="EmailAddress"
+                    placeholder="Email Address"
+                    value={profileData.email}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="EmailAddress">Email Address</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="city"
+                    className={"form-control"}
+                    id="City"
+                    placeholder="City"
+                    value={profileData.city}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="City">City</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="state"
+                    className={"form-control"}
+                    id="State"
+                    placeholder="State"
+                    value={profileData.state}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="State">State</label>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6 mb-3">
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    name="country"
+                    className={"form-control"}
+                    id="Country"
+                    placeholder="Country"
+                    value={profileData.country}
+                    onChange={handleInputChange}
+                    disabled={!isEditable}
+                  />
+                  <label htmlFor="Country">Country</label>
+                </div>
+              </div>
+            </div>
+            {isEditable && (
+              <div className="d-flex justify-content-end">
+                <button type="button" className="close-btn me-3" onClick={() => setIsEditable(false)}>
+                  Close
+                </button>
+                <button type="button" className="edit-admin-btn" onClick={handleSaveProfile}>
+                  Save
+                </button>
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
 
                         {/* Change Password Section */}
-                        <div
-                          className={`collapse ${
-                            activeSection === "change-password" ? "show" : ""
-                          }`}
-                          id="change-password"
-                        >
-                          <div className="change-password-sec">
-                            <h4 className="admin-title">Change Password</h4>
-                            <p className="admin-content mb-4">
-                              To change your password, please fill in the fields
-                              below. Your password must contain at least 8
-                              characters, it must also include at least one
-                              upper case letter, one lower case letter, one
-                              number and one special character.
-                            </p>
-                            <form>
-                              <div className="form-floating mb-3 position-relative">
-                                <input
-                                  type={showPassword ? "text" : "password"}
-                                  name="CurrentPassword"
-                                  className={"form-control"}
-                                  id="CurrentPassword"
-                                  placeholder="Enter Current Password"
-                                />
-                                <button
-                                  type="button"
-                                  className="eye-btn"
-                                  onClick={togglePasswordVisibility}
-                                >
-                                  {showPassword ? (
-                                    <img
-                                      src="./assets/images/eye-slash.svg"
-                                      alt="eye-slash"
-                                      className="img-fluid"
-                                    />
-                                  ) : (
-                                    <img
-                                      src="./assets/images/eye.svg"
-                                      alt="eye"
-                                      className="img-fluid"
-                                    />
-                                  )}
-                                </button>
-                                <label
-                                  htmlFor="CurrentPassword"
-                                  className="floating-label"
-                                >
-                                  Current Password
-                                </label>
-                              </div>
-                              <div className="form-floating mb-3 position-relative">
-                                <input
-                                  type={showPassword2 ? "text" : "password"}
-                                  name="newpassword"
-                                  className={"form-control"}
-                                  id="newpassword"
-                                  placeholder="Enter New Password"
-                                />
-                                <button
-                                  type="button"
-                                  className="eye-btn"
-                                  onClick={togglePasswordVisibility2}
-                                >
-                                  {showPassword2 ? (
-                                    <img
-                                      src="./assets/images/eye-slash.svg"
-                                      alt="eye-slash"
-                                      className="img-fluid"
-                                    />
-                                  ) : (
-                                    <img
-                                      src="./assets/images/eye.svg"
-                                      alt="eye"
-                                      className="img-fluid"
-                                    />
-                                  )}
-                                </button>
-                                <label
-                                  htmlFor="newpassword"
-                                  className="floating-label"
-                                >
-                                  New Password
-                                </label>
-                              </div>
-                              <div className="form-floating mb-3 position-relative">
-                                <input
-                                  type={showPassword3 ? "text" : "password"}
-                                  name="ConfirmPassword"
-                                  className={"form-control"}
-                                  id="ConfirmPassword"
-                                  placeholder="Enter Confirm Password"
-                                />
-                                <button
-                                  type="button"
-                                  className="eye-btn"
-                                  onClick={togglePasswordVisibility3}
-                                >
-                                  {showPassword3 ? (
-                                    <img
-                                      src="./assets/images/eye-slash.svg"
-                                      alt="eye-slash"
-                                      className="img-fluid"
-                                    />
-                                  ) : (
-                                    <img
-                                      src="./assets/images/eye.svg"
-                                      alt="eye"
-                                      className="img-fluid"
-                                    />
-                                  )}
-                                </button>
-                                <label
-                                  htmlFor="ConfirmPassword"
-                                  className="floating-label"
-                                >
-                                  Confirm Password
-                                </label>
-                              </div>
-                              <button type="submit" className="submit-btn">
-                                Change Password
-                              </button>
-                            </form>
-                          </div>
-                        </div>
+                        <div className={`collapse ${activeSection === "change-password" ? "show" : ""}`} id="change-password">
+      <div className="change-password-sec">
+        <h4 className="admin-title">Change Password</h4>
+        <p className="admin-content mb-4">
+          To change your password, please fill in the fields below. Your password must contain at least 8 characters,
+          it must also include at least one upper case letter, one lower case letter, one number and one special character.
+        </p>
+        <form onSubmit={handleSubmit}>
+          <div className="form-floating mb-3 position-relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="CurrentPassword"
+              className={"form-control"}
+              id="CurrentPassword"
+              placeholder="Enter Current Password"
+              value={oldPass}
+              onChange={(e) => setOldPass(e.target.value)}
+            />
+            <button type="button" className="eye-btn" onClick={togglePasswordVisibility}>
+              {showPassword ? (
+                <img src="./assets/images/eye-slash.svg" alt="eye-slash" className="img-fluid" />
+              ) : (
+                <img src="./assets/images/eye.svg" alt="eye" className="img-fluid" />
+              )}
+            </button>
+            <label htmlFor="CurrentPassword" className="floating-label">Current Password</label>
+          </div>
+          <div className="form-floating mb-3 position-relative">
+            <input
+              type={showPassword2 ? "text" : "password"}
+              name="newpassword"
+              className={"form-control"}
+              id="newpassword"
+              placeholder="Enter New Password"
+              value={newPass}
+              onChange={(e) => setNewPass(e.target.value)}
+            />
+            <button type="button" className="eye-btn" onClick={togglePasswordVisibility2}>
+              {showPassword2 ? (
+                <img src="./assets/images/eye-slash.svg" alt="eye-slash" className="img-fluid" />
+              ) : (
+                <img src="./assets/images/eye.svg" alt="eye" className="img-fluid" />
+              )}
+            </button>
+            <label htmlFor="newpassword" className="floating-label">New Password</label>
+          </div>
+          <div className="form-floating mb-3 position-relative">
+            <input
+              type={showPassword3 ? "text" : "password"}
+              name="ConfirmPassword"
+              className={"form-control"}
+              id="ConfirmPassword"
+              placeholder="Enter Confirm Password"
+              value={confirmPass}
+              onChange={(e) => setConfirmPass(e.target.value)}
+            />
+            <button type="button" className="eye-btn" onClick={togglePasswordVisibility3}>
+              {showPassword3 ? (
+                <img src="./assets/images/eye-slash.svg" alt="eye-slash" className="img-fluid" />
+              ) : (
+                <img src="./assets/images/eye.svg" alt="eye" className="img-fluid" />
+              )}
+            </button>
+            <label htmlFor="ConfirmPassword" className="floating-label">Confirm Password</label>
+          </div>
+          <button type="submit" className="submit-btn">Change Password</button>
+        </form>
+      </div>
+    </div>
 
                         {/* Terms & Conditions Section */}
                         <div

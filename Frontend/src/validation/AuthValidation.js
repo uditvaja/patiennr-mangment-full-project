@@ -18,21 +18,21 @@ export const forgotPasswordValidationSchema = Yup.object({
 });
 // register validation
 export const registerValidationSchema = Yup.object().shape({
-  firstName: Yup.string()
+  first_name: Yup.string()
     .min(2, 'First Name is too short!')
     .max(50, 'First Name is too long!')
     .required('First Name is required'),
-  
-  lastName: Yup.string()
+
+  last_name: Yup.string()
     .min(2, 'Last Name is too short!')
     .max(50, 'Last Name is too long!')
     .required('Last Name is required'),
-  
+
   email: Yup.string()
     .email('Invalid email address')
     .required('Email is required'),
 
-  phoneNumber: Yup.string()
+  phone_number: Yup.string()
     .matches(/^[0-9]+$/, 'Phone number is not valid')
     .min(10, 'Phone number must be at least 10 digits')
     .max(15, 'Phone number can be up to 15 digits')
@@ -47,7 +47,7 @@ export const registerValidationSchema = Yup.object().shape({
   city: Yup.string()
     .required('City is required'),
 
-  hospital: Yup.string()
+  hospitalId: Yup.string()
     .required('Please select a hospital'),
 
   password: Yup.string()

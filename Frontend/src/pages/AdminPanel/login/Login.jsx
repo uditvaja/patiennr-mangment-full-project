@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import AuthSlider from "../../../components/auth-slider/AuthSlider";
-import { Link, useNavigate } from "react-router-dom";
+import { json, Link, useNavigate } from "react-router-dom";
 import "./Login.scss";
 import { loginValidationSchema } from "../../../validation/AuthValidation";
 import axios from "axios";
@@ -22,15 +22,20 @@ const Login = () => {
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('admin');
     try {
       const response = await axios.post('http://localhost:9500/v1/admin/admin-login', {
         identifier: values.email, // 'email' represents both email and phone
         password: values.password,
       });
-
+      console.log("Login successful:", response.data.data._id);
       if (response.status === 200) {
        
         const token = response.data.token;
+        localStorage.setItem("admin", JSON.stringify(response.data.data));
+        localStorage.setItem("adminId", response.data.data._id);
+        console.log("Login successful:", response.data);        
         localStorage.setItem('token', token); 
         setError(null); // Clear error state
         navigate('/'); 

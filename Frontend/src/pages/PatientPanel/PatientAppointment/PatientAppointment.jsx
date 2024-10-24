@@ -6,6 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./PatientAppointment.scss";
 import CancelAppointment from "../../../components/modals/CancelAppointment/CancelAppointment";
+import axios from 'axios';
 
 const PatientAppointment = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

@@ -4,6 +4,7 @@ import Sidebar from "../../../components/Sidebar/Sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./PatientManagement.scss";
 import PatientDetailsModal from "../../../components/modals/PatientDetailsModal/PatientDetailsModal";
+import axios from "axios";
 
 const allAppointments = {
   today: [
@@ -144,6 +145,10 @@ const PatientManagement = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("today");
+  const [previousAppointments, setPreviousAppointments] = useState([]);
+
+  console.log("previousAppointments", previousAppointments);
+  
 
   const sidebarRef = useRef(null);
   const location = useLocation();
@@ -239,7 +244,7 @@ const PatientManagement = () => {
     );
   };
 
-  const renderAppointmentTable = (appointments, searchTerm) => {
+  const renderAppointmentTables = (appointments, searchTerm) => {
     const filteredAppointments = getFilteredAppointments(
       appointments,
       searchTerm
@@ -323,6 +328,107 @@ const PatientManagement = () => {
       </div>
     );
   };
+
+  const renderAppointmentTable = (appointments, searchTerm) => {
+    const filteredAppointments = getFilteredAppointments(
+      appointments,
+      searchTerm
+    );
+    if (filteredAppointments.length === 0) {
+      return (
+        <div className="text-center py-5">
+          <img
+            src="/assets/images/no-today-appointment.png"
+            alt="No appointments"
+            className="mb-3 img-fluid"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="table-responsive">
+        <table className="table today-patient_management-table table-hover">
+          <thead>
+            <tr>
+              <th className="rounded-end-0">Patient Name</th>
+              <th className="rounded-end-0 rounded-start-0">Patient Issue</th>
+              <th className="rounded-end-0 rounded-start-0">Doctor Name</th>
+              <th className="rounded-end-0 rounded-start-0">Disease Name</th>
+              <th className="rounded-end-0 rounded-start-0">Appointment Time</th>
+              <th className="rounded-end-0 rounded-start-0">Appointment Type</th>
+              <th className="rounded-start-0">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredAppointments.map((appointment, index) => (
+              <tr key={index}>
+                <td>
+                  <img
+                    src={appointment.profilePicture}
+                    alt={appointment.patientName}
+                    className="me-3 img-fluid profile_img"
+                  />
+                  {appointment.patientName}
+                </td>
+                <td>{appointment.patientIssue}</td>
+                <td>{appointment.doctorName}</td>
+                <td>{appointment.diseaseName}</td>
+                <td>
+                  <div className="patient_management-time">
+                    {appointment.appointmentTime}
+                  </div>
+                </td>
+                <td className="text-center patient_management-badge">
+                  <span
+                    className={`badge badge-${
+                      appointment.appointmentType === "Online"
+                        ? "warning"
+                        : "primary"
+                    }`}
+                  >
+                    {appointment.appointmentType}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="bg-transparent"
+                    onClick={() => handleViewPatient(appointment)}
+                  >
+                    <img
+                      src="/assets/images/view-icon-box.svg"
+                      alt="view-icon-box"
+                      className="img-fluid"
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    const fetchPreviousAppointments = async () => {
+      const adminId = localStorage.getItem('adminId'); // Get adminId from localStorage
+      console.log("Admin ID:", adminId);
+      
+      try {
+        const response = await axios.get(`http://localhost:9500/v1/dashboard-adminFlow/appointement-previous`, {
+          adminId, // Pass adminId in the body
+        });
+        console.log("Previous Appointments:", response.data);
+        
+        setPreviousAppointments(response.data); // Set the fetched data to the state
+      } catch (error) {
+        console.error("Error fetching previous appointments:", error);
+      }
+    };
+  
+    fetchPreviousAppointments();
+  }, []);
 
   return (
     <div className="d-flex">
@@ -571,7 +677,7 @@ const PatientManagement = () => {
                   />
                 </div>
               </div>
-              {renderAppointmentTable(allAppointments.today, searchTerms.today)}
+              {renderAppointmentTables(allAppointments.today, searchTerms.today)}
             </Tab>
             <Tab eventKey="upcoming" title="Upcoming Appointment">
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -593,7 +699,7 @@ const PatientManagement = () => {
                   />
                 </div>
               </div>
-              {renderAppointmentTable(allAppointments.upcoming, searchTerms.upcoming)}
+              {renderAppointmentTables(allAppointments.upcoming, searchTerms.upcoming)}
             </Tab>
             <Tab eventKey="previous" title="Previous Appointment">
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -615,7 +721,7 @@ const PatientManagement = () => {
                   />
                 </div>
               </div>
-              {renderAppointmentTable(allAppointments.previous, searchTerms.previous)}
+              {renderAppointmentTable(previousAppointments, searchTerms.previous)}
             </Tab>
             <Tab eventKey="canceled" title="Cancel Appointment">
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -635,7 +741,7 @@ const PatientManagement = () => {
                   />
                 </div>
               </div>
-              {renderAppointmentTable(allAppointments.canceled, searchTerms.canceled)}
+              {renderAppointmentTables(allAppointments.canceled, searchTerms.canceled)}
             </Tab>
           </Tabs>
         </div>

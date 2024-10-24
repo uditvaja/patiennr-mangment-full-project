@@ -26,8 +26,9 @@ router.put("/reset-password", doctorAuthController.resetPassword);
 router.post("/change-password", authenticDoctor, doctorAuthController.changePassword);
 
 router.post("/create-time-slot",  doctorTimeSlotController.createTimeSlot);
+// all doctor api
+router.get("/getAllDoctors", doctorAuthController.getAllDoctors);
 
- 
 const storage = multer.memoryStorage(); // Use memory storage for direct upload to Cloudinary
 const upload = multer({ storage: storage });
 

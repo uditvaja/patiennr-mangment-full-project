@@ -82,7 +82,7 @@ const PatientRegister = () => {
 
   const fetchHospitals = async () => {
     try {
-      const response = await axios.get("https://example.com/api/hospitals");
+      const response = await axios.get("http://localhost:9500/v1/hospital/get-hospitals");
       setHospitals(response.data.hospitals);
     } catch (error) {
       console.error("Error fetching hospitals:", error);
