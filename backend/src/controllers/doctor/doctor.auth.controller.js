@@ -56,7 +56,7 @@ const login = async (req, res) => {
 
     // Generate JWT token
     const token = await jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1m", // Token expires in 1 minute
+      expiresIn: "3h", // Token expires in 1 minute
     });
 
     // Optionally store the token in the doctor object
@@ -173,6 +173,36 @@ const forgotPass = async (req, res) => {
   }
 };
 
+const getAllDoctors = async (req, res) => {
+  try {
+    // Find all doctors in the database
+    const doctors = await Doctor.find();
+
+    // Check if there are doctors in the database
+    if (!doctors || doctors.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "No doctors found.",
+      });
+    }
+
+    // Respond with the list of doctors
+    res.status(200).json({
+      status: 200,
+      success: true,
+      data: doctors,
+      message: "Doctors retrieved successfully.",
+    });
+  } catch (error) {
+    // Handle errors and send a response
+    res.status(500).json({
+      status: 500,
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
 
 // // /* ------------------------------- VERIFY OTP ------------------------------- */
 const verifyOtp = async (req, res) => {
@@ -335,5 +365,5 @@ module.exports = {
   verifyOtp,
   resetPassword,
   changePassword,
-
+  getAllDoctors
 };

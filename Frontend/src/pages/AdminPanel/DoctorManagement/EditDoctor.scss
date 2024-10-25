@@ -282,6 +282,13 @@
     color: $color13;
   }
 
+  .rounded-full {
+    width: 186px;
+    height: 186px;
+    border-radius: 50%;
+    border: 3px solid $color7;
+  }
+
   .edit_upload_title {
     font-weight: 600;
     font-size: 16px;

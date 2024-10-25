@@ -12,10 +12,10 @@ const DoctorManagement = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -87,11 +87,6 @@ const DoctorManagement = () => {
     };
   }, [isSidebarOpen]);
 
-  const handleDrawerOpen = (doctor) => {
-    setSelectedDoctor(doctor);
-    setDrawerOpen(true);
-  };
-
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
@@ -105,48 +100,100 @@ const DoctorManagement = () => {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteDoctor = () => {
-    console.log("Deleting doctor:", selectedDoctor);
-    setOpenDeleteModal(false);
-  };
-
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      if (searchTerm.length < 2) {
-        setDoctors([]); // Clear results if search term is too short
-        return;
-      }
-      
-      setLoading(true);
-
-      const token = localStorage.getItem("token");
-
+  const handleDeleteDoctor = async () => {
+    const token = localStorage.getItem("token");
+    const adminId = localStorage.getItem("adminId");
+    if (selectedDoctor) {
       try {
-        const response = await axios.get(
-          `http://localhost:9500/v1/dashboard-admin/search-doctor-and-patient-list?query=${searchTerm}`,
+        await axios.delete(
+          `http://localhost:9500/v1/admin/delete-doc-by-admin`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Include the token in the headers
             },
+            data: { doctorId: selectedDoctor._id, adminid: adminId },
           }
         );
-        
-        setDoctors(response.data.searchResults); // Assume API response has doctors in "doctors" field
+        setDoctors(
+          doctors.filter((doctor) => doctor._id !== selectedDoctor._id)
+        );
+        setFilteredDoctors(
+          filteredDoctors.filter((doctor) => doctor._id !== selectedDoctor._id)
+        );
+        setOpenDeleteModal(false);
       } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error deleting doctor:", error);
       }
-    };
+    }
+  };
 
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:9500/v1/doctor/getAlldoctors"
+      );
+      setDoctors(response.data.data);
+      setFilteredDoctors(response.data.searchResults);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchDoctors();
-  }, [searchTerm]); // Fetch new results when searchTerm changes
+  }, []);
 
-  // Filter doctors based on the search term
-  const filteredDoctors = doctors.filter((doctor) =>
-    doctor.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Search doctors based on the search term
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      if (searchTerm) {
+        // Perform search only when there's a search term
+        const token = localStorage.getItem("token");
+        axios
+          .get(
+            `http://localhost:9500/v1/dashboard-admin/search-doctor-and-patient-list?query=${searchTerm}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the headers
+              },
+            }
+          )
+          .then((response) => setFilteredDoctors(response.data.searchResults))
+          .catch((error) => console.error("Error searching doctors:", error));
+      } else {
+        // Reset to all doctors if search term is cleared
+        setFilteredDoctors(doctors);
+      }
+    }, 300); // 300 ms delay
+
+    return () => clearTimeout(delaySearch); // Cleanup delay on each change
+  }, [searchTerm, doctors]);
+
+  const fetchDoctorDetails = async (doctorId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const adminId = localStorage.getItem("adminId");
+  
+      const response = await axios.post(
+        `http://localhost:9500/v1/dashboard-adminFlow/doctor-list-id`,
+        {
+          adminId: adminId,
+          doctorId: doctorId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        }
+      );
+  
+      setSelectedDoctor(response.data.doctor); // Set the fetched data as the selected doctor
+      setDrawerOpen(true); // Open the drawer
+    } catch (error) {
+      console.error("Error fetching doctor details:", error);
+    }
+  };
+  
 
   return (
     <div className="d-flex">
@@ -239,7 +286,12 @@ const DoctorManagement = () => {
                       <Dropdown.Menu className="notification-menu">
                         <div className="notification-header d-flex justify-content-between align-items-center">
                           <span>Notification</span>
-                          <button className="close-btn" onClick={clearNotifications}>&times;</button>
+                          <button
+                            className="close-btn"
+                            onClick={clearNotifications}
+                          >
+                            &times;
+                          </button>
                         </div>
                         {notifications.length > 0 ? (
                           notifications.map((notification) => (
@@ -312,7 +364,12 @@ const DoctorManagement = () => {
                     <Dropdown.Menu className="notification-menu">
                       <div className="notification-header d-flex justify-content-between align-items-center">
                         <span>Notification</span>
-                        <button className="close-btn" onClick={clearNotifications}>&times;</button>
+                        <button
+                          className="close-btn"
+                          onClick={clearNotifications}
+                        >
+                          &times;
+                        </button>
                       </div>
                       {notifications.length > 0 ? (
                         notifications.map((notification) => (
@@ -400,9 +457,7 @@ const DoctorManagement = () => {
 
           {/* Table */}
           <div className="table-responsive">
-          {loading ? (
-              <div className="text-center">Loading...</div>
-            ) : filteredDoctors.length === 0 ? (
+            {filteredDoctors?.length === 0 ? (
               <div className="text-center">
                 <img
                   src="/assets/images/no-doctor-found-2.png"
@@ -433,7 +488,7 @@ const DoctorManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDoctors.map((doctor, index) => (
+                  {filteredDoctors?.map((doctor, index) => (
                     <tr key={index}>
                       <td>
                         <img
@@ -461,7 +516,9 @@ const DoctorManagement = () => {
                         <div className="date-box">{doctor.workingTime}</div>
                       </td>
                       <td>
-                        <div className="date-box">{doctor.patientCheckUpTime}</div>
+                        <div className="date-box">
+                          {doctor.patientCheckUpTime}
+                        </div>
                       </td>
                       <td>
                         <div className="date-box">{doctor.breakTime}</div>
@@ -470,7 +527,7 @@ const DoctorManagement = () => {
                         <button
                           type="button"
                           className="edit-button me-3 bg-transparent"
-                          onClick={() => navigate(`/edit-doctor/${doctor.id}`)}
+                          onClick={() => navigate(`/edit-doctor/${doctor._id}`)}
                         >
                           <img
                             src="/assets/images/edit-icon-box.svg"
@@ -481,7 +538,7 @@ const DoctorManagement = () => {
                         <button
                           type="button"
                           className="view-button me-3 bg-transparent"
-                          onClick={() => handleDrawerOpen(doctor)}
+                          onClick={() => fetchDoctorDetails(doctor._id)}
                         >
                           <img
                             src="/assets/images/view-icon-box.svg"

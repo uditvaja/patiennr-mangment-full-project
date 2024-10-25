@@ -9,39 +9,45 @@ import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null); 
-  const navigate = useNavigate(); 
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const initialValues = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     rememberMe: false,
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post('http://localhost:9500/v1/admin/admin-login', {
-        identifier: values.email, // 'email' represents both email and phone
-        password: values.password,
-      });
+      const response = await axios.post(
+        "http://localhost:9500/v1/admin/admin-login",
+        {
+          identifier: values.email, // 'email' represents both email and phone
+          password: values.password,
+        }
+      );
 
       if (response.status === 200) {
-       
+        const adminId = response.data.adminId;
+        localStorage.setItem("adminId", adminId);
         const token = response.data.token;
-        localStorage.setItem('token', token); 
+        localStorage.setItem("token", token);
         setError(null);
-        toast.success(response.message);
+        toast.success(response.data.message);
         setTimeout(() => {
-          navigate('/'); // Navigate after delay
-        }, 2000); 
+          navigate("/"); // Navigate after delay
+        }, 2000);
       }
     } catch (err) {
       // Handle login error
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -66,7 +72,7 @@ const Login = () => {
                         type="email"
                         name="email"
                         className={`form-control ${
-                          errors.email && touched.email ? 'is-invalid' : ''
+                          errors.email && touched.email ? "is-invalid" : ""
                         }`}
                         id="email"
                         placeholder="Enter Email or Phone Number"
@@ -78,15 +84,14 @@ const Login = () => {
                         className="invalid-feedback"
                       />
                     </div>
-
                     <div className="form-floating mb-3 position-relative">
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="password"
                         className={`form-control ${
                           errors.password && touched.password
-                            ? 'is-invalid'
-                            : ''
+                            ? "is-invalid"
+                            : ""
                         }`}
                         id="password"
                         placeholder="Enter Password"
@@ -119,9 +124,8 @@ const Login = () => {
                         className="invalid-feedback"
                       />
                     </div>
-
-                    {error && <p className="text-danger">{error}</p>} {/* Show error */}
-
+                    {error && <p className="text-danger">{error}</p>}{" "}
+                    {/* Show error */}
                     <div className="d-flex align-items-center justify-content-between">
                       <div className="mb-3 form-check">
                         <Field
@@ -143,7 +147,6 @@ const Login = () => {
                         </Link>
                       </div>
                     </div>
-
                     <button type="submit" className="login-btn w-100">
                       Login
                     </button>

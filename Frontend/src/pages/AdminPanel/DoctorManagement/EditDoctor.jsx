@@ -1,42 +1,44 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Dropdown } from "react-bootstrap";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import "./EditDoctor.scss";
+import axios from "axios";
 
 const EditDoctor = () => {
+  const { doctorId } = useParams();
+  const adminId = localStorage.getItem("adminId");
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [signatureFile, setSignatureFile] = useState(null);
   const [doctor, setDoctor] = useState({
-    name: "Alfredo Ekstrom Bothman",
-    profileImage: "/assets/images/doctor-pic.png",
-    qualification: "Bachelor of Ayurvedic Medicine",
-    gender: "Male",
-    specialty: "Obstetrics and gynecology",
-    checkupTime: "2 Hour",
-    phoneNumber: "85456 52563",
-    country: "India",
-    zipCode: "382002",
-    consultationRate: "₹ 1,000",
-    email: "kenzi.lawson@example.com",
-    age: "32 Years",
-    state: "Gujarat",
-    city: "Gandhinagar",
-    address: "4517 Washington Ave. Manchester,39495",
-    workOn: "Online",
-    breakTime: "1 Hour",
-    workingTime: "6 Hour",
-    experience: "5 Years",
-    description: "Dr. Patel has honed her skills in providing...",
-    hospital: {
-      currentHospital: "Hospital",
-      name: "Medanta Hospital",
-      website: "http://sample.edu/",
-      emergencyContact: "58485 56987",
-      address: "6391 Elgin St. Celina, Delaware 10299",
-    },
-    signature: "/assets/images/signature-2.png",
+    firstName: "",
+    qualification: "",
+    gender: "",
+    specialistType: "",
+    workOn: "",
+    workingTime: "",
+    patientCheckUpTime: "",
+    breakTime: "",
+    experience: "",
+    phoneNumber: "",
+    age: "",
+    email: "",
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
+    doctorAddress: "",
+    description: "",
+    consultationRate: "",
+    image: "",
+    signatureImage: "",
+    currentHospital: "",
+    hospitalName: "",
+    website: "",
+    emergencyContact: "",
   });
 
   const [notifications, setNotifications] = useState([
@@ -110,6 +112,32 @@ const EditDoctor = () => {
     };
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      const token = localStorage.getItem("token");
+      const adminId = localStorage.getItem("adminId");
+      try {
+        const response = await axios.post(
+          `http://localhost:9500/v1/dashboard-adminFlow/doctor-list-id`,
+          {
+            adminId: adminId,
+            doctorId: doctorId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setDoctor(response.data.doctor);
+      } catch (error) {
+        console.error("Error fetching doctor:", error);
+      }
+    };
+
+    if (doctorId) fetchDoctor();
+  }, [doctorId]);
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setDoctor({ ...doctor, [name]: value });
@@ -119,6 +147,52 @@ const EditDoctor = () => {
     const file = event.target.files[0];
     if (file) {
       setProfilePhoto(file);
+      setDoctor((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
+    }
+  };
+
+  const handleSignatureChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSignatureFile(file);
+      setDoctor((prev) => ({
+        ...prev,
+        signatureImage: URL.createObjectURL(file),
+      })); 
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      const token = localStorage.getItem("token");
+      formData.append("doctorData", JSON.stringify(doctor));
+      if (profilePhoto) {
+        formData.append("image", profilePhoto);
+      }
+      if (signatureFile) {
+        formData.append("signatureImage", signatureFile);
+      }
+      const response = await axios.put(
+        "http://localhost:9500/v1/admin/update-doctor-by-admin",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+           adminId: adminId,
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Doctor updated successfully");
+        navigate("/doctor-management"); // Navigate back to the doctor management page or another page
+      } else {
+        console.error("Failed to update doctor");
+      }
+    } catch (error) {
+      console.error("Error updating doctor:", error);
     }
   };
 
@@ -213,7 +287,12 @@ const EditDoctor = () => {
                       <Dropdown.Menu className="notification-menu">
                         <div className="notification-header d-flex justify-content-between align-items-center">
                           <span>Notification</span>
-                          <button className="close-btn" onClick={clearNotifications}>&times;</button>
+                          <button
+                            className="close-btn"
+                            onClick={clearNotifications}
+                          >
+                            &times;
+                          </button>
                         </div>
                         {notifications.length > 0 ? (
                           notifications.map((notification) => (
@@ -286,7 +365,12 @@ const EditDoctor = () => {
                     <Dropdown.Menu className="notification-menu">
                       <div className="notification-header d-flex justify-content-between align-items-center">
                         <span>Notification</span>
-                        <button className="close-btn" onClick={clearNotifications}>&times;</button>
+                        <button
+                          className="close-btn"
+                          onClick={clearNotifications}
+                        >
+                          &times;
+                        </button>
                       </div>
                       {notifications.length > 0 ? (
                         notifications.map((notification) => (
@@ -359,7 +443,7 @@ const EditDoctor = () => {
                           : doctor.profileImage
                       }
                       alt="Profile"
-                      className="rounded-circle img-thumbnail mb-2"
+                      className="rounded-full img-fluid mb-2"
                     />
                     <div className="text-center mt-3">
                       <button className="edit-choose-photo-btn">
@@ -379,10 +463,33 @@ const EditDoctor = () => {
 
               <div className="mt-4">
                 <h4 className="edit_upload_title">Upload Signature</h4>
-                <img
-                  src={doctor.signature}
-                  alt="Doctor Signature"
-                  className="img-fluid border rounded"
+                <label
+                  htmlFor="signature-upload"
+                  className="cursor-pointer mt-3"
+                >
+                  <div className="text-center">
+                    <img
+                      src={
+                        signatureFile
+                          ? URL.createObjectURL(signatureFile)
+                          : doctor.signature
+                      }
+                      alt="Signature"
+                      className="img-fluid border rounded"
+                    />
+                    <div className="text-center mt-3">
+                      <button className="edit-choose-photo-btn">
+                        Upload Signature
+                      </button>
+                    </div>
+                  </div>
+                </label>
+                <input
+                  id="signature-upload"
+                  type="file"
+                  accept="image/*"
+                  className="d-none"
+                  onChange={handleSignatureChange} // Update state with selected signature file
                 />
               </div>
             </div>
@@ -393,10 +500,11 @@ const EditDoctor = () => {
                 <div className="col-md-4">
                   <div className="form-floating mb-3">
                     <input
-                      name="name"
+                      name="firstName"
                       className="form-control"
                       type="text"
-                      value={doctor.name}
+                      value={doctor?.firstName}
+                      onChange={handleInputChange}
                       placeholder="Enter Doctor Name"
                     />
                     <label>Doctor Name</label>
@@ -407,7 +515,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="qualification"
-                      value={doctor.qualification}
+                      value={doctor?.qualification}
                       onChange={handleInputChange}
                       className="form-control"
                       type="text"
@@ -421,7 +529,7 @@ const EditDoctor = () => {
                   <div className="form-floating form-floating-select mb-3">
                     <select
                       name="gender"
-                      value={doctor.gender}
+                      value={doctor?.gender}
                       onChange={handleInputChange}
                       id="gender"
                       className="form-select"
@@ -438,8 +546,8 @@ const EditDoctor = () => {
                 <div className="col-md-4">
                   <div className="form-floating mb-3">
                     <input
-                      name="specialty"
-                      value={doctor.specialty}
+                      name="specialistType"
+                      value={doctor?.specialistType}
                       onChange={handleInputChange}
                       className="form-control"
                       type="text"
@@ -453,7 +561,7 @@ const EditDoctor = () => {
                   <div className="form-floating form-floating-select mb-3">
                     <select
                       name="workOn"
-                      value={doctor.workOn}
+                      value={doctor?.workOn}
                       onChange={handleInputChange}
                       id="workon"
                       className="form-select"
@@ -470,7 +578,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="workingTime"
-                      value={doctor.workingTime}
+                      value={doctor?.workingTime}
                       onChange={handleInputChange}
                       className="form-control"
                       type="time"
@@ -483,8 +591,8 @@ const EditDoctor = () => {
                 <div className="col-md-4">
                   <div className="form-floating mb-3">
                     <input
-                      name="checkupTime"
-                      value={doctor.checkupTime}
+                      name="patientCheckUpTime"
+                      value={doctor?.patientCheckUpTime}
                       onChange={handleInputChange}
                       className="form-control"
                       type="time"
@@ -498,7 +606,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="breakTime"
-                      value={doctor.breakTime}
+                      value={doctor?.breakTime}
                       onChange={handleInputChange}
                       className="form-control"
                       type="time"
@@ -512,10 +620,10 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="experience"
-                      value={doctor.experience}
+                      value={doctor?.experience}
                       onChange={handleInputChange}
                       className="form-control"
-                      type="number"
+                      type="text"
                       placeholder="Enter Experience"
                     />
                     <label>Experience</label>
@@ -526,7 +634,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="phoneNumber"
-                      value={doctor.phoneNumber}
+                      value={doctor?.phoneNumber}
                       onChange={handleInputChange}
                       className="form-control"
                       type="number"
@@ -540,7 +648,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="age"
-                      value={doctor.age}
+                      value={doctor?.age}
                       onChange={handleInputChange}
                       className="form-control"
                       type="number"
@@ -554,7 +662,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="email"
-                      value={doctor.email}
+                      value={doctor?.email}
                       onChange={handleInputChange}
                       className="form-control"
                       type="email"
@@ -568,13 +676,13 @@ const EditDoctor = () => {
                   <div className="form-floating form-floating-select mb-3">
                     <select
                       name="country"
-                      value={doctor.country}
+                      value={doctor?.country}
                       onChange={handleInputChange}
                       id="country"
                       className="form-select"
                     >
                       <option value="1">Select Country</option>
-                      <option value="India">India</option>
+                      <option value="india">India</option>
                       <option value="Pakistan">Pakistan</option>
                       <option value="USA">USA</option>
                     </select>
@@ -586,15 +694,15 @@ const EditDoctor = () => {
                   <div className="form-floating form-floating-select mb-3">
                     <select
                       name="state"
-                      value={doctor.state}
+                      value={doctor?.state}
                       onChange={handleInputChange}
                       id="state"
                       className="form-select"
                     >
                       <option value="1">Select State</option>
-                      <option value="India">India</option>
-                      <option value="Pakistan">Pakistan</option>
-                      <option value="USA">USA</option>
+                      <option value="gujrat">Gujarat</option>
+                      <option value="rajastan">Rajastan</option>
+                      <option value="panjab">Panjab</option>
                     </select>
                     <label htmlFor="state">State</label>
                   </div>
@@ -604,15 +712,15 @@ const EditDoctor = () => {
                   <div className="form-floating form-floating-select mb-3">
                     <select
                       name="city"
-                      value={doctor.city}
+                      value={doctor?.city}
                       onChange={handleInputChange}
                       id="city"
                       className="form-select"
                     >
                       <option value="1">Select City</option>
-                      <option value="India">India</option>
-                      <option value="Pakistan">Pakistan</option>
-                      <option value="USA">USA</option>
+                      <option value="surat">Surat</option>
+                      <option value="vadodara">Vadodara</option>
+                      <option value="jamanagar">Jamanagar</option>
                     </select>
                     <label htmlFor="city">City</label>
                   </div>
@@ -622,7 +730,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="zipCode"
-                      value={doctor.zipCode}
+                      value={doctor?.zipCode}
                       onChange={handleInputChange}
                       className="form-control"
                       type="number"
@@ -635,8 +743,8 @@ const EditDoctor = () => {
                 <div className="col-md-4">
                   <div className="form-floating mb-3">
                     <input
-                      name="address"
-                      value={doctor.address}
+                      name="doctorAddress"
+                      value={doctor?.doctorAddress}
                       onChange={handleInputChange}
                       className="form-control"
                       type="text"
@@ -650,7 +758,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="description"
-                      value={doctor.description}
+                      value={doctor?.description}
                       onChange={handleInputChange}
                       className="form-control"
                       type="text"
@@ -664,7 +772,7 @@ const EditDoctor = () => {
                   <div className="form-floating mb-3">
                     <input
                       name="consultationRate"
-                      value={doctor.consultationRate}
+                      value={doctor?.consultationRate}
                       onChange={handleInputChange}
                       className="form-control"
                       type="number"
@@ -680,8 +788,8 @@ const EditDoctor = () => {
               <div className="col-md-4">
                 <div className="form-floating mb-3">
                   <input
-                    name="hospital.currentHospital"
-                    value={doctor.hospital.currentHospital}
+                    name="currentHospital"
+                    value={doctor?.currentHospital}
                     onChange={handleInputChange}
                     className="form-control"
                     type="text"
@@ -694,8 +802,8 @@ const EditDoctor = () => {
               <div className="col-md-4">
                 <div className="form-floating mb-3">
                   <input
-                    name="hospital.name"
-                    value={doctor.hospital.name}
+                    name="hospitalName"
+                    value={doctor?.hospitalName}
                     onChange={handleInputChange}
                     className="form-control"
                     type="text"
@@ -708,8 +816,8 @@ const EditDoctor = () => {
               <div className="col-md-4">
                 <div className="form-floating mb-3">
                   <input
-                    name="hospital.address"
-                    value={doctor.hospital.address}
+                    name="doctorAddress"
+                    value={doctor?.doctorAddress}
                     onChange={handleInputChange}
                     className="form-control"
                     type="text"
@@ -722,8 +830,8 @@ const EditDoctor = () => {
               <div className="col-md-4">
                 <div className="form-floating mb-3">
                   <input
-                    name="hospital.website"
-                    value={doctor.hospital.website}
+                    name="website"
+                    value={doctor?.website}
                     onChange={handleInputChange}
                     className="form-control"
                     type="text"
@@ -736,8 +844,8 @@ const EditDoctor = () => {
               <div className="col-md-4">
                 <div className="form-floating mb-3">
                   <input
-                    name="hospital.emergencyContact"
-                    value={doctor.hospital.emergencyContact}
+                    name="emergencyContact"
+                    value={doctor?.emergencyContact}
                     onChange={handleInputChange}
                     className="form-control"
                     type="number"
@@ -749,7 +857,7 @@ const EditDoctor = () => {
             </div>
 
             <div className="col-12 text-end mt-4">
-              <button type="submit" className="save-btn">
+              <button type="submit" className="save-btn" onClick={handleSave}>
                 Save
               </button>
             </div>

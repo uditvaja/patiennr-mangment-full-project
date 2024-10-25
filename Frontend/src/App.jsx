@@ -89,7 +89,7 @@ function App() {
         <Route path="/billing/monitor-billing" element={<MonitorBilling />} />
         <Route path="/billing/monitor-billing/invoice" element={<MonitorBillingInvoice />} />
         <Route path="/add-new-doctor" element={<AddDoctorForm />} />
-        <Route path="/edit-doctor/:id" element={<EditDoctor />} />
+        <Route path="/edit-doctor/:doctorId" element={<EditDoctor />} />
         <Route path="/billing/pandingbills" element={<PendingBills />} />
         <Route path="/billing/monitor-billing/pending-invoice" element={<BookingInvoice />} />
         <Route path="/billing/monitor-billing/createBill" element={<CreateBill />} />

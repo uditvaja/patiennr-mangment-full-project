@@ -1,8 +1,8 @@
 import React from "react";
-import { Drawer, Button } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Drawer } from "@mui/material";
 
 const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
+  
   // Check if the doctor is online
   const isOnline = doctor?.status === "Online";
 
@@ -31,21 +31,21 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
               <div className="d-flex align-items-center">
                 <img
                   src={
-                    doctor?.profilePicture || "https://via.placeholder.com/100"
+                    doctor?.image || "https://via.placeholder.com/100"
                   }
-                  alt={doctor?.name}
+                  alt={doctor?.firstName}
                   className="rounded-circle me-3"
                   style={{ width: "64px", height: "64px" }}
                 />
 
                 <div className="d-flex flex-column">
-                  <h3 className="doctor-name">{doctor?.name}</h3>
+                  <h3 className="doctor-name">{doctor?.firstName}</h3>
                   <p className="text-white">
                     {doctor?.gender === "Male" ? (
                       <>
                         <img
                           src={`./assets/images/${doctor?.gender}`}
-                          alt={doctor?.name}
+                          alt={doctor?.firstName}
                           style={{
                             width: "30px",
                             height: "30px",
@@ -58,7 +58,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                       <>
                         <img
                           src={`./assets/images/${doctor?.gender}`}
-                          alt={doctor?.name}
+                          alt={doctor?.firstName}
                           style={{
                             width: "30px",
                             height: "30px",
@@ -129,7 +129,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                   />
                   <div className="d-flex flex-column">
                     <strong> Hospital Address</strong>
-                    <p>{doctor?.hospitalAddress}</p>
+                    <p>{doctor?.doctorAddress}</p>
                   </div>
                 </div>
               </div>
@@ -142,21 +142,21 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
               <div className="d-flex align-items-center">
                 <img
                   src={
-                    doctor?.profilePicture || "https://via.placeholder.com/100"
+                    doctor?.image || "https://via.placeholder.com/100"
                   }
-                  alt={doctor?.name}
+                  alt={doctor?.firstName}
                   className="rounded-circle me-3"
                   style={{ width: "64px", height: "64px" }}
                 />
 
                 <div className="d-flex flex-column">
-                  <h3 className="doctor-name">{doctor?.name}</h3>
+                  <h3 className="doctor-name">{doctor?.firstName}</h3>
                   <p className="text-white">
                     {doctor?.gender === "Male" ? (
                       <>
                         <img
                           src={`./assets/images/${doctor?.gender}`}
-                          alt={doctor?.name}
+                          alt={doctor?.firstName}
                           style={{
                             width: "30px",
                             height: "30px",
@@ -169,7 +169,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                       <>
                         <img
                           src={`./assets/images/${doctor?.gender}`}
-                          alt={doctor?.name}
+                          alt={doctor?.firstName}
                           style={{
                             width: "30px",
                             height: "30px",
@@ -198,14 +198,14 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                 <div className="col-6 mb-3">
                   <p>
                     <strong className="d-block">Years Of Experience</strong>
-                    {doctor?.yearsOfExperience}
+                    {doctor?.experience}
                   </p>
                 </div>
 
                 <div className="col-6 mb-3">
                   <p>
                     <strong className="d-block">Specialty Type</strong>
-                    {doctor?.specialty}
+                    {doctor?.specialistType}
                   </p>
                 </div>
 
@@ -219,7 +219,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                 <div className="col-6 mb-3">
                   <p>
                     <strong className="d-block">Patient Check Up Time</strong>
-                    {doctor?.checkupTime}
+                    {doctor?.patientCheckUpTime}
                   </p>
                 </div>
 
@@ -242,7 +242,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                 <p className="sign">Signature</p>
                 <img
                   src={
-                    doctor?.signature || "https://via.placeholder.com/100x50"
+                    doctor?.signatureImage || "https://via.placeholder.com/100x50"
                   }
                   alt="Doctor Signature"
                   className="img-fluid mt-2"
@@ -266,7 +266,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
 
                   <div className="col-6 mb-3">
                     <p>
-                      <strong className="d-block">Phone</strong> {doctor?.phone}
+                      <strong className="d-block">Phone</strong> {doctor?.phoneNumber}
                     </p>
                   </div>
 
@@ -309,7 +309,7 @@ const DoctorDetailsDrawer = ({ open, onClose, doctor }) => {
                     </p>
                   </div>
                   <div className="col-12 small font-weight-bold">
-                    <p>{doctor?.address}</p>
+                    <p>{doctor?.doctorAddress}</p>
                   </div>
                 </div>
               </div>
