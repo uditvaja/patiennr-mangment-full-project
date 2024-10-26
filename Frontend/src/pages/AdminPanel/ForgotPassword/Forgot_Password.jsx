@@ -33,7 +33,6 @@ const Forgot_Password = () => {
       const { adminId } = response.data; // Assuming adminId comes from the API response
       localStorage.setItem("forgotPassEmail", values.email);
       localStorage.setItem("adminId", adminId);
-      console.log(response.data);
       // Handle success - navigate to the OTP verification page
       otpNavigation();
     } catch (error) {

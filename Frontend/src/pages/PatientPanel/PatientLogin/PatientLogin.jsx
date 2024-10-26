@@ -32,7 +32,6 @@ const PatientLogin = () => {
       localStorage.setItem("patientId", response.data.patientId);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("patient", JSON.stringify(response.data));
-      console.log("Login successful:", response.data);
       // Handle successful login (e.g., save token, redirect)
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);

@@ -40,7 +40,6 @@ const Otp_screen = () => {
         }
       );
 
-      console.log("OTP verification response:", response.data);
       resetPasswordNavigation(); // Navigate on success
     } catch (error) {
       console.error("Error verifying OTP:", error);

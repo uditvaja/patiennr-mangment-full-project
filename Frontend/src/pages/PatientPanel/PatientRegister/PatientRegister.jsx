@@ -65,7 +65,6 @@ const PatientRegister = () => {
         "http://localhost:9500/v1/patient/create-patient",
         payload
       );
-      console.log("Registration successful:", response.data);
       // Optionally, you can redirect or show a success message
     } catch (error) {
       console.error(

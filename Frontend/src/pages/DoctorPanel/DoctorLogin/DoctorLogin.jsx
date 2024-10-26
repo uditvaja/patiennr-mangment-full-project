@@ -30,8 +30,6 @@ const DoctorLogin = () => {
         }
       );
 
-      console.log("Login successful:", response.data);
-
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("refreshToken", response.data.refreshToken);
 

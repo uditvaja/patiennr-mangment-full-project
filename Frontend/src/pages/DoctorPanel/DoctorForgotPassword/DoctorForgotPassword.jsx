@@ -27,7 +27,6 @@ const DoctorForgotPassword = () => {
       const { doctorId } = response.data; // Assuming adminId comes from the API response
       localStorage.setItem("forgotPassEmail", values.email);
       localStorage.setItem("doctorId", doctorId);
-      console.log(response.data);
       // Handle success - navigate to the OTP verification page
       navigate("/doctor-otp-verification");
     } catch (error) {

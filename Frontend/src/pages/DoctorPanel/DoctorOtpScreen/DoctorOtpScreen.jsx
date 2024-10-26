@@ -39,8 +39,6 @@ const DoctorOtpScreen = () => {
           otp: values.otp.join(""), // Concatenate the OTP array to a string
         }
       );
-
-      console.log("OTP verification response:", response.data);
       navigate("/doctor-reset-password"); // Navigate on success
     } catch (error) {
       console.error("Error verifying OTP:", error);
