@@ -31,13 +31,16 @@ const DoctorResetPassword = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:9500/v1/doctor/reset-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "http://localhost:9500/v1/doctor/reset-password",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (response.ok) {
         alert("Password reset successful");
@@ -72,7 +75,9 @@ const DoctorResetPassword = () => {
                         type={showPassword ? "text" : "password"}
                         name="newPassword"
                         className={`form-control ${
-                          errors.newPassword && touched.newPassword ? "is-invalid" : ""
+                          errors.newPassword && touched.newPassword
+                            ? "is-invalid"
+                            : ""
                         }`}
                         id="newPassword"
                         placeholder="Enter New Password"
@@ -111,7 +116,9 @@ const DoctorResetPassword = () => {
                         type={showPassword2 ? "text" : "password"}
                         name="confirmPassword"
                         className={`form-control ${
-                          errors.confirmPassword && touched.confirmPassword ? "is-invalid" : ""
+                          errors.confirmPassword && touched.confirmPassword
+                            ? "is-invalid"
+                            : ""
                         }`}
                         id="confirmPassword"
                         placeholder="Confirm New Password"
@@ -135,7 +142,10 @@ const DoctorResetPassword = () => {
                           />
                         )}
                       </button>
-                      <label htmlFor="confirmPassword" className="floating-label">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="floating-label"
+                      >
                         Confirm Password
                       </label>
                       <ErrorMessage

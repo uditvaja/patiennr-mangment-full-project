@@ -4,6 +4,7 @@ import "./register.scss";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { registerValidationSchema } from "../../../validation/AuthValidation";
 
 const Register = () => {
@@ -60,7 +61,7 @@ const Register = () => {
         }
       );
 
-      alert("Registration successful");
+      toast.success("Registration successful");
       navigate("/login");
     } catch (error) {
       console.error("Error during registration:", error);
@@ -418,21 +419,16 @@ const Register = () => {
                     <div className="form-check mb-3">
                       <Field
                         type="checkbox"
-                        name="agreeToTerms"
+                        name="agree"
                         className={`form-check-input ${
-                          errors.agreeToTerms && touched.agreeToTerms
-                            ? "is-invalid"
-                            : ""
+                          errors.agree && touched.agree ? "is-invalid" : ""
                         }`}
                       />
-                      <label
-                        htmlFor="agreeToTerms"
-                        className="form-check-label"
-                      >
+                      <label htmlFor="agree" className="form-check-label">
                         I agree to the terms and conditions
                       </label>
                       <ErrorMessage
-                        name="agreeToTerms"
+                        name="agree"
                         component="div"
                         className="invalid-feedback"
                       />

@@ -3,7 +3,6 @@ import AuthSlider from "../../../components/auth-slider/AuthSlider";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { pregisterValidationSchema } from "../../../validation/AuthValidation";
 import "./PatientRegister.scss";
 
 const PatientRegister = () => {
@@ -16,26 +15,27 @@ const PatientRegister = () => {
   const [hospitals, setHospitals] = useState([]);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
   const initialValues = {
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    country: '',
-    state: '',
-    city: '',
-    hospitalId: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    country: "",
+    state: "",
+    city: "",
+    hospitalId: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     agreeToTerms: false,
-    age: '',
-    gender: '',
-    bloodgroup: '',
-    height: '',
-    weight: '',
-    birthdate: '',
-    patientAddress: ''
+    age: "",
+    gender: "",
+    bloodgroup: "",
+    height: "",
+    weight: "",
+    birthdate: "",
+    patientAddress: "",
   };
 
   const handleSubmit = async (values) => {
@@ -55,18 +55,23 @@ const PatientRegister = () => {
       dob: values.birthdate,
       blood_group: values.bloodgroup,
       weight: values.weight,
-      height: values.height
+      height: values.height,
     };
-console.log(payload);
-dob: new Date(values.birthdate).toISOString().split('T')[0],
-
-console.log("Form values:", values);
+    console.log(payload);
+    dob: new Date(values.birthdate).toISOString().split("T")[0],
+      console.log("Form values:", values);
     try {
-      const response = await axios.post("http://localhost:9500/v1/patient/create-patient", payload);
+      const response = await axios.post(
+        "http://localhost:9500/v1/patient/create-patient",
+        payload
+      );
       console.log("Registration successful:", response.data);
       // Optionally, you can redirect or show a success message
     } catch (error) {
-      console.error("Registration error:", error.response?.data || error.message);
+      console.error(
+        "Registration error:",
+        error.response?.data || error.message
+      );
       // Handle errors here (e.g., show a message to the user)
     }
   };
@@ -78,7 +83,9 @@ console.log("Form values:", values);
 
   const fetchCountriesAndStates = async () => {
     try {
-      const response = await axios.get("https://countriesnow.space/api/v0.1/countries/states");
+      const response = await axios.get(
+        "https://countriesnow.space/api/v0.1/countries/states"
+      );
       const countryList = response.data.data.map((country) => ({
         name: country.name,
         iso3: country.iso3,
@@ -92,10 +99,13 @@ console.log("Form values:", values);
 
   const fetchCities = async (countryName, stateName) => {
     try {
-      const response = await axios.post("https://countriesnow.space/api/v0.1/countries/state/cities", {
-        country: countryName,
-        state: stateName,
-      });
+      const response = await axios.post(
+        "https://countriesnow.space/api/v0.1/countries/state/cities",
+        {
+          country: countryName,
+          state: stateName,
+        }
+      );
       setCities(response.data.data);
     } catch (error) {
       console.error("Error fetching cities:", error);
@@ -104,7 +114,9 @@ console.log("Form values:", values);
 
   const fetchHospitals = async () => {
     try {
-      const response = await axios.get("http://localhost:9500/v1/hospital/get-hospitals");
+      const response = await axios.get(
+        "http://localhost:9500/v1/hospital/get-hospitals"
+      );
       setHospitals(response.data.data);
     } catch (error) {
       console.error("Error fetching hospitals:", error);
@@ -342,10 +354,11 @@ console.log("Form values:", values);
                         <Field
                           as="select"
                           name="country"
-                          className={`form-select ${errors.country && touched.country
-                            ? "is-invalid"
-                            : ""
-                            }`}
+                          className={`form-select ${
+                            errors.country && touched.country
+                              ? "is-invalid"
+                              : ""
+                          }`}
                           onChange={(e) => {
                             const selectedCountry = e.target.value;
                             setFieldValue("country", selectedCountry);
@@ -373,8 +386,9 @@ console.log("Form values:", values);
                         <Field
                           as="select"
                           name="state"
-                          className={`form-select ${errors.state && touched.state ? "is-invalid" : ""
-                            }`}
+                          className={`form-select ${
+                            errors.state && touched.state ? "is-invalid" : ""
+                          }`}
                           onChange={(e) => {
                             const selectedState = e.target.value;
                             setFieldValue("state", selectedState);
@@ -399,8 +413,9 @@ console.log("Form values:", values);
                         <Field
                           as="select"
                           name="city"
-                          className={`form-select ${errors.city && touched.city ? "is-invalid" : ""
-                            }`}
+                          className={`form-select ${
+                            errors.city && touched.city ? "is-invalid" : ""
+                          }`}
                         >
                           <option value="">Select City</option>
                           {cities.map((city, index) => (
@@ -422,8 +437,11 @@ console.log("Form values:", values);
                       <Field
                         as="select"
                         name="hospitalId" // Updated to hospitalId
-                        className={`form-select ${errors.hospitalId && touched.hospitalId ? "is-invalid" : ""
-                          }`}
+                        className={`form-select ${
+                          errors.hospitalId && touched.hospitalId
+                            ? "is-invalid"
+                            : ""
+                        }`}
                       >
                         <option value="">Select Hospital</option>
                         {hospitals.map((hospital) => (
@@ -438,7 +456,6 @@ console.log("Form values:", values);
                         className="invalid-feedback"
                       />
                     </div>
-
 
                     {/* Password */}
                     <div className="form-floating mb-3 position-relative">

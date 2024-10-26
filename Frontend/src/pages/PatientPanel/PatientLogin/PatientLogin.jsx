@@ -7,7 +7,6 @@ import * as Yup from "yup"; // Ensure you import Yup for validation
 import "./PatientLogin.scss";
 import { loginValidationSchema } from "../../../validation/AuthValidation";
 
- 
 const PatientLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,10 +22,13 @@ const PatientLogin = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await axios.post("http://localhost:9500/v1/patient/patient-login", {
-        identifier: values.email,
-        password: values.password,
-      });
+      const response = await axios.post(
+        "http://localhost:9500/v1/patient/patient-login",
+        {
+          identifier: values.email,
+          password: values.password,
+        }
+      );
       localStorage.setItem("patientId", response.data.patientId);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("patient", JSON.stringify(response.data));

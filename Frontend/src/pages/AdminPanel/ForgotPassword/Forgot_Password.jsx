@@ -8,7 +8,7 @@ import "./Forgot_Password.scss";
 
 const Forgot_Password = () => {
   const navigate = useNavigate();
-  
+
   const initialValues = {
     email: "",
   };
@@ -22,23 +22,26 @@ const Forgot_Password = () => {
       localStorage.removeItem("forgotPassEmail");
       localStorage.removeItem("adminId");
       // Make the API request
-      const response = await axios.post("http://localhost:9500/v1/admin/forgot-pass", {
-        email: values.email,
-      });
-     
-      
+      const response = await axios.post(
+        "http://localhost:9500/v1/admin/forgot-pass",
+        {
+          email: values.email,
+        }
+      );
+
       // Store email and adminId in localStorage
-      const { adminId } = response.data;  // Assuming adminId comes from the API response
+      const { adminId } = response.data; // Assuming adminId comes from the API response
       localStorage.setItem("forgotPassEmail", values.email);
       localStorage.setItem("adminId", adminId);
       console.log(response.data);
       // Handle success - navigate to the OTP verification page
       otpNavigation();
-
     } catch (error) {
       console.error("Error during API call:", error);
       if (error.response && error.response.data) {
-        setErrors({ email: error.response.data.message || "An error occurred" });
+        setErrors({
+          email: error.response.data.message || "An error occurred",
+        });
       }
     } finally {
       setSubmitting(false);
@@ -53,7 +56,8 @@ const Forgot_Password = () => {
             <div className="forgot-card p-4">
               <h2 className="mb-2 forgot-title">Forgot Password</h2>
               <h6 className="forgot-sub-title mb-4">
-                Enter your email and we’ll send you an OTP to reset your password.
+                Enter your email and we’ll send you an OTP to reset your
+                password.
               </h6>
               <Formik
                 initialValues={initialValues}
@@ -66,7 +70,9 @@ const Forgot_Password = () => {
                       <Field
                         type="email"
                         name="email"
-                        className={`form-control ${errors.email && touched.email ? "is-invalid" : ""}`}
+                        className={`form-control ${
+                          errors.email && touched.email ? "is-invalid" : ""
+                        }`}
                         id="email"
                         placeholder="Enter Email or Phone Number"
                       />

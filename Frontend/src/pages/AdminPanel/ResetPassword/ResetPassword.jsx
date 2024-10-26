@@ -4,10 +4,11 @@ import { resetPasswordValidationSchema } from "../../../validation/AuthValidatio
 import "./ResetPassword.scss";
 import AuthSlider from "../../../components/auth-slider/AuthSlider";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -30,16 +31,19 @@ const navigate = useNavigate();
     };
 
     try {
-      const response = await fetch("http://localhost:9500/v1/admin/reset-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "http://localhost:9500/v1/admin/reset-password",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (response.ok) {
-        alert("Password reset successful");
+        toast.success("Password reset successful");
         console.log("Password reset successful");
         // Optionally redirect or display success message here
         navigate("/login");
@@ -71,7 +75,9 @@ const navigate = useNavigate();
                         type={showPassword ? "text" : "password"}
                         name="newPassword"
                         className={`form-control ${
-                          errors.newPassword && touched.newPassword ? "is-invalid" : ""
+                          errors.newPassword && touched.newPassword
+                            ? "is-invalid"
+                            : ""
                         }`}
                         id="newPassword"
                         placeholder="Enter New Password"
@@ -110,7 +116,9 @@ const navigate = useNavigate();
                         type={showPassword2 ? "text" : "password"}
                         name="confirmPassword"
                         className={`form-control ${
-                          errors.confirmPassword && touched.confirmPassword ? "is-invalid" : ""
+                          errors.confirmPassword && touched.confirmPassword
+                            ? "is-invalid"
+                            : ""
                         }`}
                         id="confirmPassword"
                         placeholder="Confirm New Password"
@@ -134,7 +142,10 @@ const navigate = useNavigate();
                           />
                         )}
                       </button>
-                      <label htmlFor="confirmPassword" className="floating-label">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="floating-label"
+                      >
                         Confirm Password
                       </label>
                       <ErrorMessage

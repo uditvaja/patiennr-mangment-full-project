@@ -4,11 +4,11 @@ import "./Otp_screen.scss";
 import AuthSlider from "../../../components/auth-slider/AuthSlider";
 import { otpValidationSchema } from "../../../validation/AuthValidation";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";  
+import axios from "axios";
 
 const Otp_screen = () => {
   const navigate = useNavigate();
-  
+
   // Get email from localStorage
   const email = localStorage.getItem("forgotPassEmail");
 
@@ -32,14 +32,16 @@ const Otp_screen = () => {
   const handleSubmit = async (values) => {
     try {
       // Make the API request with the email and OTP
-      const response = await axios.post("http://localhost:9500/v1/admin/verify-otp", {
-        email,  // Pass the stored email
-        otp: values.otp.join(""),  // Concatenate the OTP array to a string
-      });
+      const response = await axios.post(
+        "http://localhost:9500/v1/admin/verify-otp",
+        {
+          email, // Pass the stored email
+          otp: values.otp.join(""), // Concatenate the OTP array to a string
+        }
+      );
 
       console.log("OTP verification response:", response.data);
       resetPasswordNavigation(); // Navigate on success
-
     } catch (error) {
       console.error("Error verifying OTP:", error);
     }
@@ -53,7 +55,8 @@ const Otp_screen = () => {
             <div className="otp-card p-4">
               <h2 className="mb-2 otp-title">Enter OTP</h2>
               <h6 className="otp-sub-title mb-4">
-                Please enter the 6 digit code sent to your phone number or email.
+                Please enter the 6 digit code sent to your phone number or
+                email.
               </h6>
               <Formik
                 initialValues={initialValues}
@@ -69,7 +72,11 @@ const Otp_screen = () => {
                           type="text"
                           name={`otp[${index}]`}
                           maxLength="1"
-                          className={`otp-input ${errors.otp && touched.otp && touched.otp[index] ? "is-invalid" : ""}`}
+                          className={`otp-input ${
+                            errors.otp && touched.otp && touched.otp[index]
+                              ? "is-invalid"
+                              : ""
+                          }`}
                           onChange={handleChange}
                         />
                       ))}
@@ -83,12 +90,16 @@ const Otp_screen = () => {
                           className="img-fluid me-2"
                         />
                         <h6 className="otp-time mb-0">
-                          {`00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft}`} sec
+                          {`00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft}`}{" "}
+                          sec
                         </h6>
                       </div>
                       <div className="mb-3">
                         {timeLeft === 0 ? (
-                          <button onClick={() => setTimeLeft(30)} className="main-link">
+                          <button
+                            onClick={() => setTimeLeft(30)}
+                            className="main-link"
+                          >
                             Resend OTP
                           </button>
                         ) : (
