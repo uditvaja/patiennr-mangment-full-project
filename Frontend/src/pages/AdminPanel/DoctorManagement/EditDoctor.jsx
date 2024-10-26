@@ -185,6 +185,9 @@ const EditDoctor = () => {
         }
       );
 
+      console.log("response====>", response);
+      
+
       if (response.status === 200) {
         console.log("Doctor updated successfully");
         navigate("/doctor-management"); // Navigate back to the doctor management page or another page
@@ -440,7 +443,7 @@ const EditDoctor = () => {
                       src={
                         profilePhoto
                           ? URL.createObjectURL(profilePhoto)
-                          : doctor.profileImage
+                          : doctor.image
                       }
                       alt="Profile"
                       className="rounded-full img-fluid mb-2"
@@ -472,7 +475,7 @@ const EditDoctor = () => {
                       src={
                         signatureFile
                           ? URL.createObjectURL(signatureFile)
-                          : doctor.signature
+                          : doctor.specialistType
                       }
                       alt="Signature"
                       className="img-fluid border rounded"
