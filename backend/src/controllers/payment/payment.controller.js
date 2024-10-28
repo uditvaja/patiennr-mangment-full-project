@@ -10,7 +10,7 @@ const client = new paypal.core.PayPalHttpClient(environment);
 
 // Initiate PayPal payment
 exports.initiatePayment = async (req, res) => {
-    const { billId } = req.params; // Bill ID from the URL parameter
+    const { billId } = req.body; // Bill ID from the URL parameter
     try {
         // Fetch the bill to get the total payable amount
         const bill = await Bill.findById(billId);
@@ -18,7 +18,11 @@ exports.initiatePayment = async (req, res) => {
             return res.status(404).json({ error: 'Bill not found' });
         }
 
-        const totalAmount = bill.totalPrice;
+        // Check if totalPrice exists in the bill document
+        const totalAmount = bill.TotalAmount;
+        if (totalAmount === undefined || totalAmount === null) {
+            return res.status(400).json({ error: 'Total amount is not available in the bill' });
+        }
 
         // Create the order for PayPal
         const request = new paypal.orders.OrdersCreateRequest();
@@ -54,6 +58,7 @@ exports.initiatePayment = async (req, res) => {
     }
 };
 
+
 // Capture PayPal payment
 
 // Capture PayPal payment
@@ -65,12 +70,14 @@ exports.capturePayment = async (req, res) => {
         request.requestBody({});
 
         const capture = await client.execute(request);
-
         console.log('Capture Response:', capture); // Log the entire capture response
 
         // Check if payment was successful
         if (capture.result.status !== 'COMPLETED') {
-            return res.status(400).json({ error: 'Payment capture failed, order is not completed' });
+            return res.status(400).json({
+                error: 'Payment capture failed',
+                message: 'Order has not been approved by the payer. Please approve the payment and try again.'
+            });
         }
 
         // Update the bill status to 'paid'
@@ -78,7 +85,6 @@ exports.capturePayment = async (req, res) => {
 
         if (!bill) {
             return res.status(404).json({ error: 'Bill not found' });
-            
         }
 
         res.status(200).json({
@@ -89,9 +95,13 @@ exports.capturePayment = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Payment capture failed', message: error.message });
+        res.status(500).json({
+            error: 'Payment capture failed',
+            message: error.message
+        });
     }
 };
+
 
 
 // exports.capturePayment = async (req, res) => {

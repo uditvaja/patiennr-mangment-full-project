@@ -5,8 +5,8 @@ const express = require("express");
 // const countryRoute = require("./patient/web/country.route");
 // const patientRoute = require("./patient/app/auth.route");
 // const favoriteRoute = require("./patient/app/favoritedoctor.route");
-// const appointmentRoute = require("./patient/app/appointmentbook.route");
-// const helpDoctorRoute = require("./patient/web/help.route");
+const patientDashboardRoute = require("./patient/dashboard/dashboard.route");
+const paymentRoute = require("./payment/payment.route");
 const billCreateRoute = require("./bill/bill.route");
 
 /* ---------------------------- DOCTOR ROUTE PATH --------------------------- */
@@ -29,6 +29,7 @@ const bookappointementPatientFlowRoute = require("./bookappointment/book.appoint
 const dashboardAdminFlowRoute = require("./admin/dashboard/dashboard.route")
 const videoCallRoute = require("./videocall/tokenRoute")
 const chatRoute = require("./chat/chat.route")
+
 
 
 
@@ -62,9 +63,9 @@ router.use("/chat", chatRoute);
 
 
 router.use("/bill", billCreateRoute);
-// router.use("/faq-patient", faqPatientRoute);
+router.use("/payment", paymentRoute);
 
-// router.use("/help", helpRoute);
+router.use("/dashboard-patient",patientDashboardRoute );
 // router.use("/homescreen", homeScreenDoctorRoute);
 
 

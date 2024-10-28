@@ -54,6 +54,12 @@ const prescriptionSchema = new mongoose.Schema({
   medicinePrices: { // New field to store the prices of medicines
     type: [Object],
     required: true, // Ensure this is always provided
+  },
+  report:{
+    type:String,
+  },
+  reportDate:{
+    type:String,
   }
 });
 

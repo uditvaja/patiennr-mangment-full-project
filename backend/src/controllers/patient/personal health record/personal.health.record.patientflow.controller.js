@@ -176,11 +176,65 @@ const getpatintDetails = async (req, res) => {
           };
           
 
+          const getTestReportPatient = async (req, res) => {
+            try {
+              const { patientId } = req.body; // Expecting patientId in the request body
+          
+              // Validate patientId
+              if (!patientId) {
+                return res.status(400).json({ message: 'Invalid patient ID' });
+              }
+          
+              // Fetch all prescriptions for the specified patientId
+              const appointments = await Prescription.find({ patientId })
+                .populate('doctorId', 'firstName lastName image') // Populate doctor's first and last name
+                .populate('appointmentId'); // Populate the AppointmentBook reference
+          
+              // If no appointments found for the patient
+              if (appointments.length === 0) {
+                return res.status(404).json({ message: 'No appointments found for this patient' });
+              }
+          
+              // Debug: Log the appointments retrieved
+              // console.log('Retrieved Appointments:', appointments);
+          
+              // Map to extract required details from the appointments
+              const appointmentDetails = appointments.map(appointment => {
+                const doctor = appointment.doctorId; // Populated doctor
+                const appointmentBook = appointment.appointmentId; // Populated appointment book
+          
+                return {
+                  appointmentId: appointment._id,
+                  doctorName: doctor ? `${doctor.firstName} ${doctor.lastName}` : 'Unknown', // Full doctor name
+                  doctorImage: doctor && doctor.image ? doctor.image : 'default_image_url', // Check for doctor.image
+          
+                  // Accessing disease_name and patient_issue from the populated appointmentId
+                  disease_name: appointmentBook ? appointmentBook.disease_name : 'Unknown', // Disease name from AppointmentBook
+                  patient_issue: appointmentBook ? appointmentBook.patient_issue : 'Unknown', // Patient issue from AppointmentBook
+                  app_time: appointmentBook ? appointmentBook.app_time : 'Unknown', // Patient issue from AppointmentBook
+                  app_date: appointmentBook ? appointmentBook.app_date : 'Unknown', // Patient issue from AppointmentBook
+                  status: appointmentBook ? appointmentBook.status : 'Unknown', // Patient issue from AppointmentBook
+                  
+                  report: appointment.report, // Report
+                  reportDate: appointment.reportDate, // Report date
+                };
+              });
+          
+              // Return the list of appointments for the patient
+              res.status(200).json(appointmentDetails);
+            } catch (error) {
+              console.error(error);
+              res.status(500).json({ message: 'Server error' });
+            }
+          };
+          
+          
 
 module.exports = {
     getpatintDetails,
     getPatientDetailsMedicalView,
     getPatientAppointmentsMedical,
-    getPatientAppointmentsMedicalPersnoal
+    getPatientAppointmentsMedicalPersnoal,
+    getTestReportPatient
  
   };

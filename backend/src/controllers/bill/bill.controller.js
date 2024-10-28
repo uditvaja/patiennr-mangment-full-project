@@ -13,13 +13,15 @@ const createBill = async (req, res) => {
 
     // Convert BillTime to correct format if it's a string
     if (typeof reqBody.BillTime === 'string') {
-      reqBody.BillTime = moment(reqBody.BillTime, 'hh:mm A').toDate(); // Convert "12:19 Pm" to Date
+      reqBody.BillTime = moment(reqBody.BillTime, 'hh:mm A').toDate(); // Convert "12:19 PM" to Date
     }
 
-    const bill = await Bill.create(reqBody);
-    if (!bill) {
-      throw new Error("Failed to create bill");
-    }
+    // Create a new instance of Bill
+    const bill = new Bill(reqBody);
+    
+    // Save the bill instance
+    await bill.save();
+
     res.status(200).json({
       status: 200,
       message: "Successfully created a new bill",
@@ -30,6 +32,7 @@ const createBill = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 const monitorBill = async (req, res) => {
     try {

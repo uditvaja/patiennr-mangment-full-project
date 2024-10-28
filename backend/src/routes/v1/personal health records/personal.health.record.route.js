@@ -15,6 +15,8 @@ router.get("/personal-details-list-medical-persnoal", patientFlowPersonalHealthR
 
 router.get("/personal-details-list-medical-prescriptions-views", patientFlowPersonalHealthRecordController.getPatientDetailsMedicalView);
 
+router.get("/test-report-views", patientFlowPersonalHealthRecordController.getTestReportPatient);
+
 
 
 

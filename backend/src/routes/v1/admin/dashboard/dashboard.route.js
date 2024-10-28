@@ -24,6 +24,17 @@ router.get("/appointement-previous", dashboardController.getPreviousAppointments
 router.get("/appointement-cancel", dashboardController.getCanceledAppointments);
 router.get("/appointement-wise-patient-detail-id", dashboardController.getAppointmentDetailsOfPatientById);
 
+router.get("/dashboard-main-count", dashboardController.getDashboardCount);
+router.get("/dashboard-patient-count-month-week", dashboardController.getPatientCounts);
+router.get("/dashboard-patient-count-new-old", dashboardController.getPatientCountsNewOld);
+
+
+
+
+
+
+
+
 
 
 // this is pending work

@@ -466,6 +466,93 @@ const getAppointmentDetailsOfPatientById = async (req, res) => {
   }
 };
 
+
+
+
+//Get Dashboard Count Data
+const getDashboardCount = async (req, res, next) => {
+  try {
+    const totalDoctors = await Doctor.countDocuments();
+    const totalPatients = await Patient.countDocuments();
+    
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    
+    const todayAppointments = await AppointmentBook.countDocuments({
+      date: { $gte: startOfDay, $lt: endOfDay },
+    });
+
+    res.status(200).json({
+      totalDoctors,
+      totalPatients,
+      todayAppointments,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching dashboard stats', error });
+  }
+};
+
+
+
+
+const getPatientCounts = async (req, res) => {
+  try {
+    const today = new Date();
+    
+    // Count for this year
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    const totalPatientsYear = await Patient.countDocuments({
+      createdAt: { $gte: startOfYear, $lt: new Date(startOfYear.getFullYear() + 1, 0, 1) },
+    });
+
+    // Count for this month
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const totalPatientsMonth = await Patient.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: new Date(startOfMonth.getFullYear(), startOfMonth.getMonth() + 1, 1) },
+    });
+
+    // Count for this week
+    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const totalPatientsWeek = await Patient.countDocuments({
+      createdAt: { $gte: startOfWeek, $lt: new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + 7) },
+    });
+
+    res.status(200).json({
+      totalPatientsYear,
+      totalPatientsMonth,
+      totalPatientsWeek,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching patient counts', error });
+  }
+};
+
+const getPatientCountsNewOld = async (req, res) => {
+  try {
+    const today = new Date();
+    const oneYearAgo = new Date(today.setFullYear(today.getFullYear() - 1));
+
+    // Count total patients
+    const totalPatients = await Patient.countDocuments();
+
+    // Count new patients (registered in the last year)
+    const newPatients = await Patient.countDocuments({
+      createdAt: { $gte: oneYearAgo },
+    });
+
+    // Count old patients (registered more than a year ago)
+    const oldPatients = totalPatients - newPatients;
+
+    res.status(200).json({
+      totalPatients,
+      newPatients,
+      oldPatients,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching patient counts', error });
+  }
+};
 // const getTodayAppointmentsSearch = async (req, res) => {
 //   try {
 //     const { adminId } = req.body;
@@ -731,6 +818,9 @@ const getAppointmentDetailsOfPatientById = async (req, res) => {
     getPreviousAppointments,
     getCanceledAppointments,
     getAppointmentDetailsOfPatientById,
+    getDashboardCount,
+    getPatientCounts,
+    getPatientCountsNewOld
     // getTodayAppointmentsSearch,getUpcomingAppointmentsSearch,
     // getPreviousAppointmentsSearch,getCanceledAppointmentsSearch
 

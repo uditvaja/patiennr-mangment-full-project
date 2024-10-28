@@ -44,6 +44,9 @@ module.exports.billPatientFlowController = require("./bill/patient.flow.bill.con
 
 module.exports.paymentController = require("./payment/payment.controller");
 
+module.exports.dashboardPatientController = require("./patient/dashboard/patient.dashboard.controller");
+
+
 
 
 

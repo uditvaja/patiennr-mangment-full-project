@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const billSchema = new mongoose.Schema({
+   
  patient_name:{
      type: mongoose.Schema.Types.ObjectId,
     ref: 'patient'
@@ -9,6 +10,7 @@ const billSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'doctor'
  },
+ prescriptionId: { type: mongoose.Schema.Types.ObjectId, ref: 'prescription', required: true },
  desription:{
 type:String,
  },
