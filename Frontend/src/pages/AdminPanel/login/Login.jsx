@@ -69,7 +69,7 @@ const Login = () => {
                   <Form>
                     <div className="form-floating mb-3">
                       <Field
-                        type="email"
+                        type="text" // Changed to "text" from "email"
                         name="email"
                         className={`form-control ${
                           errors.email && touched.email ? "is-invalid" : ""

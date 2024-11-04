@@ -4,146 +4,232 @@ import Sidebar from "../../../components/Sidebar/Sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./PatientManagement.scss";
 import PatientDetailsModal from "../../../components/modals/PatientDetailsModal/PatientDetailsModal";
+import axios from 'axios';
+import toast from "react-hot-toast";
+
 
 const allAppointments = {
-  today: [
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Marcus Philips",
-      patientIssue: "Stomach Ache",
-      phoneNumber: "92584 58475",
-      age: "36 Years",
-      gender: "Male",
-      doctorName: "Dr. Marcus Philips",
-      diseaseName: "Viral Infection",
-      appointmentDate: "2 Jan, 2022",
-      appointmentTime: "4:30 PM",
-      appointmentType: "Online",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Julianna Warren",
-      patientIssue: "Stomach Ache",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Female",
-      doctorName: "Dr. Sophia Patel",
-      diseaseName: "Diabetes",
-      appointmentDate: "3 Jan, 2022",
-      appointmentTime: "2:40 PM",
-      appointmentType: "Onsite",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    // Add more dummy data...
-  ],
-  upcoming: [
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Olive Valencia",
-      patientIssue: "Headache",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Male",
-      doctorName: "Dr. Tessa Lee",
-      diseaseName: "Headache",
-      appointmentDate: "12 Jan, 2022",
-      appointmentTime: "3:30 PM",
-      appointmentType: "Online",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Rowen Floyd",
-      patientIssue: "Fever",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Female",
-      doctorName: "Dr. Winter Strong",
-      diseaseName: "Fever",
-      appointmentDate: "22 Jan, 2022",
-      appointmentTime: "2:00 AM",
-      appointmentType: "Onsite",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    // Add more dummy data...
-  ],
-  previous: [
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Gaige Castillo",
-      patientIssue: "Fever",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Male",
-      doctorName: "Dr. Yusuf Mercado",
-      diseaseName: "Viral Infection",
-      appointmentDate: "20 Feb, 2022",
-      appointmentTime: "1:30 PM",
-      appointmentType: "Onsite",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Kayla Maddox",
-      patientIssue: "Feeling Tired",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Female",
-      doctorName: "Dr. Titan Grant",
-      diseaseName: "Blood Pressure",
-      appointmentDate: "10 Jun, 2022",
-      appointmentTime: "5:00 AM",
-      appointmentType: "Online",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    // Add more dummy data...
-  ],
-  canceled: [
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Trenton Mejia",
-      patientIssue: "Fever",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "male",
-      doctorName: "Dr. Keenan Tucker",
-      diseaseName: "Viral Infection",
-      appointmentDate: "25 Jan, 2022",
-      appointmentTime: "4:30 PM",
-      appointmentType: "Online",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    {
-      profilePicture: "/assets/images/Avatar-2.png",
-      patientName: "Julianna Warren",
-      patientIssue: "Headache",
-      phoneNumber: "92584 58475",
-      age: "32 Years",
-      gender: "Female",
-      doctorName: "Dr. Ari Bullock",
-      diseaseName: "Headache",
-      appointmentDate: "18 Aug, 2022",
-      appointmentTime: "6:00 AM",
-      appointmentType: "Onsite",
-      address: "B-105 Virat Bungalows Punagam Motavaracha Jamnagar.",
-    },
-    // Add more dummy data...
-  ],
+  today: [],
+  upcoming: [],
+  previous: [],
+  canceled: [],
 };
 
 const PatientManagement = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState("today");
   const [searchTerms, setSearchTerms] = useState({
     today: "",
     upcoming: "",
     previous: "",
     canceled: "",
   });
+  const [appointmentsData, setAppointmentsData] = useState(allAppointments); // Initialize with allAppointments
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredAppointments, setFilteredAppointments] = useState({
+    today: [],
+    upcoming: [],
+    previous: [],
+    canceled: [],
+  });
+
+  // Fetch today's appointments
+  const fetchTodayAppointments = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        console.error("Admin ID is not found in localStorage");
+        return;
+      }
+
+      const todayResponse = await axios.get(
+        "http://localhost:9500/v1/dashboard-adminFlow/appointement-today",
+        { params: { adminId: adminId } }
+      );
+
+      console.log(todayResponse.data, "Full response from today's API");
+      if (todayResponse.data.appointments && todayResponse.data.appointments.length > 0) {
+        const todayAppointments = todayResponse.data.appointments.map(appointment => ({
+          id: appointment._id,
+          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          patientIssue: appointment.patient_issue,
+          doctorName: appointment.doctorId.firstName,
+          diseaseName: appointment.diseas_name,
+          appointmentTime: appointment.startTime,
+          appointmentType: appointment.appointmentType,
+          appointmentDate: appointment.app_date,
+          profilePicture: "/path/to/default/profile/pic.jpg" // Modify accordingly
+        }));
+
+        setAppointmentsData(prevData => ({
+          ...prevData,
+          today: todayAppointments,
+        }));
+      } else {
+        console.error("No today's appointments found in response.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching today's appointments");
+      console.error("Error fetching today's appointments:", error);
+    }
+  };
+
+  // Fetch upcoming appointments
+  const fetchUpcomingAppointments = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        console.error("Admin ID is not found in localStorage");
+        return;
+      }
+
+      const upcomingResponse = await axios.get(
+        "http://localhost:9500/v1/dashboard-adminFlow/appointement-upcomming",
+        { params: { adminId: adminId } }
+      );
+
+      console.log(upcomingResponse.data, "Full response from upcoming API");
+      if (upcomingResponse.data.appointments && upcomingResponse.data.appointments.length > 0) {
+        const upcomingAppointments = upcomingResponse.data.appointments.map(appointment => ({
+          id: appointment._id,
+          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          patientIssue: appointment.patient_issue,
+          doctorName: appointment.doctorId.firstName,
+          diseaseName: appointment.diseas_name,
+          appointmentTime: appointment.startTime,
+          appointmentType: appointment.appointmentType,
+          appointmentDate: appointment.app_date,
+          profilePicture: "/path/to/default/profile/pic.jpg" // Modify accordingly
+        }));
+
+        setAppointmentsData(prevData => ({
+          ...prevData,
+          upcoming: upcomingAppointments,
+        }));
+      } else {
+        console.error("No upcoming appointments found in response.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching upcoming appointments");
+      console.error("Error fetching upcoming appointments:", error);
+    }
+  };
+
+  // Fetch previous appointments
+  const fetchPreviousAppointments = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        console.error("Admin ID is not found in localStorage");
+        return;
+      }
+
+      const previousResponse = await axios.get(
+        "http://localhost:9500/v1/dashboard-adminFlow/appointement-previous",
+        { params: { adminId: adminId } }
+      );
+
+      console.log(previousResponse.data, "Full response from previous appointments API");
+      if (previousResponse.data.appointments && previousResponse.data.appointments.length > 0) {
+        const previousAppointments = previousResponse.data.appointments.map(appointment => ({
+          id: appointment._id,
+          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          patientIssue: appointment.patient_issue,
+          doctorName: appointment.doctorId.firstName,
+          diseaseName: appointment.diseas_name,
+          appointmentTime: appointment.startTime,
+          appointmentType: appointment.appointmentType,
+          appointmentDate: appointment.app_date,
+          profilePicture: "/path/to/default/profile/pic.jpg" // Modify accordingly
+        }));
+
+        setAppointmentsData(prevData => ({
+          ...prevData,
+          previous: previousAppointments,
+        }));
+      } else {
+        console.error("No previous appointments found in response.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching previous appointments");
+      console.error("Error fetching previous appointments:", error);
+    }
+  };
+
+  // Fetch canceled appointments
+  const fetchCanceledAppointments = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        console.error("Admin ID is not found in localStorage");
+        return;
+      }
+
+      const canceledResponse = await axios.get(
+        "http://localhost:9500/v1/dashboard-adminFlow/appointement-cancel",
+        { params: { adminId: adminId } }
+      );
+
+      console.log(canceledResponse.data, "Full response from canceled appointments API");
+      if (canceledResponse.data.appointments && canceledResponse.data.appointments.length > 0) {
+        const canceledAppointments = canceledResponse.data.appointments.map(appointment => ({
+          id: appointment._id,
+          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          patientIssue: appointment.patient_issue,
+          doctorName: appointment.doctorId.firstName,
+          diseaseName: appointment.diseas_name,
+          appointmentTime: appointment.startTime,
+          appointmentType: appointment.appointmentType,
+          appointmentDate: appointment.app_date,
+          profilePicture: "/path/to/default/profile/pic.jpg" // Modify accordingly
+        }));
+
+        setAppointmentsData(prevData => ({
+          ...prevData,
+          canceled: canceledAppointments,
+        }));
+      } else {
+        console.error("No canceled appointments found in response.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching canceled appointments");
+      console.error("Error fetching canceled appointments:", error);
+    }
+  };
+
+   // Handle tab change
+   const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    switch (tab) {
+      case 'today':
+        fetchTodayAppointments();
+        break;
+      case 'upcoming':
+        fetchUpcomingAppointments();
+        break;
+      case 'previous':
+        fetchPreviousAppointments();
+        break;
+      case 'canceled':
+        fetchCanceledAppointments();
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    fetchTodayAppointments(); // Fetch today's appointments by default on initial load
+  }, []);
+
+
+
+  
+
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("today");
+ 
 
   const [notifications, setNotifications] = useState([
     {
@@ -175,7 +261,8 @@ const PatientManagement = () => {
       icon: "payment-cancelled-icon.svg",
     },
   ]);
-
+  const [doctors, setDoctors] = useState([]);
+  
   const noNotificationImage = "/assets/images/no-notification.png";
 
   const clearNotifications = () => {
@@ -186,6 +273,7 @@ const PatientManagement = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+ 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
@@ -244,10 +332,14 @@ const PatientManagement = () => {
   };
 
   const renderAppointmentTable = (appointments, searchTerm) => {
-    const filteredAppointments = getFilteredAppointments(
-      appointments,
-      searchTerm
+    const filteredAppointments = appointments.filter(
+      appointment =>
+        appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        appointment.patientIssue.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        appointment.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        appointment.diseaseName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
     if (filteredAppointments.length === 0) {
       return (
         <div className="text-center py-5">
@@ -259,52 +351,39 @@ const PatientManagement = () => {
         </div>
       );
     }
-
+  
     return (
       <div className="table-responsive">
         <table className="table today-patient_management-table table-hover">
           <thead>
             <tr>
-              <th className="rounded-end-0">Patient Name</th>
-              <th className="rounded-end-0 rounded-start-0">Patient Issue</th>
-              <th className="rounded-end-0 rounded-start-0">Doctor Name</th>
-              <th className="rounded-end-0 rounded-start-0">Dieses Name</th>
-              <th className="rounded-end-0 rounded-start-0">
-                Appointment Time
-              </th>
-              <th className="rounded-end-0 rounded-start-0">
-                Appointment Type
-              </th>
-              <th className="rounded-start-0">Action</th>
+            <th>Image</th>
+              <th>Patient Name</th>
+              <th>Patient Issue</th>
+              <th>Doctor Name</th>
+              <th>Diseases Name</th>
+              <th>Appointment Time</th>
+              <th>Appointment Type</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredAppointments.map((appointment, index) => (
-              <tr key={index}>
+              <tr key={appointment.id}>
                 <td>
                   <img
                     src={appointment.profilePicture}
-                    alt={appointment.patientName}
+                    // alt={appointment.patientName}
                     className="me-3 img-fluid profile_img"
                   />
-                  {appointment.patientName}
                 </td>
+                  <td>{appointment.patientName}</td>
                 <td>{appointment.patientIssue}</td>
                 <td>{appointment.doctorName}</td>
                 <td>{appointment.diseaseName}</td>
-                <td>
-                  <div className="patient_management-time">
-                    {appointment.appointmentTime}
-                  </div>
-                </td>
+                <td>{appointment.appointmentTime}</td>
                 <td className="text-center patient_management-badge">
-                  <span
-                    className={`badge badge-${
-                      appointment.appointmentType === "Online"
-                        ? "warning"
-                        : "primary"
-                    }`}
-                  >
+                  <span className={`badge badge-${appointment.appointmentType === "Online" ? "warning" : "primary"}`}>
                     {appointment.appointmentType}
                   </span>
                 </td>
@@ -327,6 +406,7 @@ const PatientManagement = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="d-flex">
@@ -551,97 +631,35 @@ const PatientManagement = () => {
           </div>
         </div>
         <div className="container-fluid patient_management_page py-4">
-          <Tabs
-            defaultActiveKey="today"
-            activeKey={activeTab}
-            onSelect={(tabKey) => setActiveTab(tabKey)}
-            className="mb-3"
-          >
-            <Tab eventKey="today" title="Today Appointment">
-              <div className="d-flex flex-lg-row flex-column justify-content-between align-items-center mb-3">
-                <h2 className="patient_management-title">Today Appointment</h2>
-                <div className="patient_management-search-container">
-                  <input
-                    type="text"
-                    value={searchTerms.today}
-                    onChange={(e) => handleSearchChange(e, "today")}
-                    placeholder="Search Patient"
-                    className="form-control"
-                  />
-                  <img
-                    src="/assets/images/search.svg"
-                    alt="search"
-                    className="search-icon"
-                  />
-                </div>
+        <Tabs activeKey={activeTab} onSelect={handleTabSelect} className="mb-3">
+        {['today', 'upcoming', 'previous', 'canceled'].map(tab => (
+          <Tab eventKey={tab} title={tab.charAt(0).toUpperCase() + tab.slice(1) + ' Appointment'} key={tab}>
+            <div className="d-flex flex-lg-row flex-column justify-content-between align-items-center mb-3">
+              <h2 className="patient_management-title">{tab.charAt(0).toUpperCase() + tab.slice(1)} Appointment</h2>
+              <div className="patient_management-search-container">
+                <input
+                  type="text"
+                  placeholder="Search Patient"
+                  value={searchTerms[tab]}
+                  onChange={(e) => handleSearchChange(e, tab)}
+                  className="form-control"
+                />
+                <img
+                  src="/assets/images/search.svg"
+                  alt="search"
+                  className="search-icon"
+                />
               </div>
-              {renderAppointmentTable(allAppointments.today, searchTerms.today)}
-            </Tab>
-            <Tab eventKey="upcoming" title="Upcoming Appointment">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="patient_management-title">
-                  Upcoming Appointment
-                </h2>
-                <div className="patient_management-search-container">
-                  <input
-                    type="text"
-                    placeholder="Search Patient"
-                    value={searchTerms.upcoming}
-                    onChange={(e) => handleSearchChange(e, "upcoming")}
-                    className="form-control"
-                  />
-                  <img
-                    src="/assets/images/search.svg"
-                    alt="search"
-                    className="search-icon"
-                  />
-                </div>
-              </div>
-              {renderAppointmentTable(allAppointments.upcoming, searchTerms.upcoming)}
-            </Tab>
-            <Tab eventKey="previous" title="Previous Appointment">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="patient_management-title">
-                  Previous Appointment
-                </h2>
-                <div className="patient_management-search-container">
-                  <input
-                    type="text"
-                    placeholder="Search Patient"
-                    value={searchTerms.previous}
-                  onChange={(e) => handleSearchChange(e, "previous")}
-                    className="form-control"
-                  />
-                  <img
-                    src="/assets/images/search.svg"
-                    alt="search"
-                    className="search-icon"
-                  />
-                </div>
-              </div>
-              {renderAppointmentTable(allAppointments.previous, searchTerms.previous)}
-            </Tab>
-            <Tab eventKey="canceled" title="Cancel Appointment">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="patient_management-title">Cancel Appointment</h2>
-                <div className="patient_management-search-container">
-                  <input
-                    type="text"
-                    placeholder="Search Patient"
-                    value={searchTerms.canceled}
-                  onChange={(e) => handleSearchChange(e, "canceled")}
-                    className="form-control"
-                  />
-                  <img
-                    src="/assets/images/search.svg"
-                    alt="search"
-                    className="search-icon"
-                  />
-                </div>
-              </div>
-              {renderAppointmentTable(allAppointments.canceled, searchTerms.canceled)}
-            </Tab>
-          </Tabs>
+            </div>
+            {renderAppointmentTable(appointmentsData[tab], searchTerms[tab])}
+          </Tab>
+        ))}
+      </Tabs>
+      <PatientDetailsModal
+        open={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+        patient={selectedPatient}
+      />
         </div>
       </div>
       <PatientDetailsModal

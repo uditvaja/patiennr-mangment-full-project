@@ -64,6 +64,8 @@ const Register = () => {
       toast.success("Registration successful");
       navigate("/login");
     } catch (error) {
+      toast.error(error.response?.data?.message || "Error during registration");
+
       console.error("Error during registration:", error);
 
       // Detailed error message from response (if available)

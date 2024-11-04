@@ -3,119 +3,120 @@ import { Dropdown } from "react-bootstrap";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./MonitorBilling.scss";
+import axios from "axios"; 
 
 const MonitorBilling = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [billingData, setBillingData] = useState([
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Colds and Flu",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "2 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Talan Press",
-      diseaseName: "Conjunctivitis",
-      phoneNumber: "89564 25462",
-      status: "Unpaid",
-      date: "25 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Allergies",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "5 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Giana Press",
-      diseaseName: "Colds and Flu",
-      phoneNumber: "89564 25462",
-      status: "Unpaid",
-      date: "2 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Nolan Botosh",
-      diseaseName: "Diarrhea",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "6 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Colds and Flu",
-      phoneNumber: "89564 25462",
-      status: "Unpaid",
-      date: "20 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Rayna Rosser",
-      diseaseName: "Mononucleosis",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "2 Jun, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Colds and Flu",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "11 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Stomach Aches",
-      phoneNumber: "89564 25462",
-      status: "Unpaid",
-      date: "2 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Stomach Aches",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "2 Jan, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Rayna Rosser",
-      diseaseName: "Mononucleosis",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "2 Jun, 2022",
-      time: "4:30 PM",
-    },
-    {
-      billNumber: "5654",
-      patientName: "Alfredo Vaccaro",
-      diseaseName: "Colds and Flu",
-      phoneNumber: "89564 25462",
-      status: "Paid",
-      date: "20 Jan, 2022",
-      time: "4:30 PM",
-    },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Colds and Flu",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "2 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Talan Press",
+    //   diseaseName: "Conjunctivitis",
+    //   phoneNumber: "89564 25462",
+    //   status: "Unpaid",
+    //   date: "25 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Allergies",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "5 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Giana Press",
+    //   diseaseName: "Colds and Flu",
+    //   phoneNumber: "89564 25462",
+    //   status: "Unpaid",
+    //   date: "2 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Nolan Botosh",
+    //   diseaseName: "Diarrhea",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "6 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Colds and Flu",
+    //   phoneNumber: "89564 25462",
+    //   status: "Unpaid",
+    //   date: "20 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Rayna Rosser",
+    //   diseaseName: "Mononucleosis",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "2 Jun, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Colds and Flu",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "11 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Stomach Aches",
+    //   phoneNumber: "89564 25462",
+    //   status: "Unpaid",
+    //   date: "2 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Stomach Aches",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "2 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Rayna Rosser",
+    //   diseaseName: "Mononucleosis",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "2 Jun, 2022",
+    //   time: "4:30 PM",
+    // },
+    // {
+    //   billNumber: "5654",
+    //   patientName: "Alfredo Vaccaro",
+    //   diseaseName: "Colds and Flu",
+    //   phoneNumber: "89564 25462",
+    //   status: "Paid",
+    //   date: "20 Jan, 2022",
+    //   time: "4:30 PM",
+    // },
     // Add more data as needed
   ]);
   const [notifications, setNotifications] = useState([
@@ -158,9 +159,46 @@ const MonitorBilling = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState(billingData);
 
+  const [error, setError] = useState(null);
+
   const sidebarRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  // const [error, setError] = useState(null); // Add this line to your component state
+
+
+  const fetchBillingData = async () => {
+    try {
+        const response = await axios.get('http://localhost:9500/v1/bill/list-bill');
+        console.log(response.data, "response");
+
+        // Check if the response was successful and contains billing data
+        if (response.data && response.data.success && response.data.data.length > 0) {
+            setBillingData(response.data.data); // Set billing data
+            setFilteredData(response.data.data); // Initialize filtered data
+        } else {
+            setBillingData([]); // Handle no data scenario
+            setFilteredData([]);
+        }
+    } catch (error) {
+        console.error('Error fetching billing data:', error);
+        setError(error.message); // Handle error scenario
+    }
+};
+
+
+  useEffect(() => {
+    fetchBillingData();
+  }, []);
+
+  useEffect(() => {
+    const results = billingData.filter((bill) =>
+      bill.patientName && bill.patientName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredData(results);
+  }, [searchTerm, billingData]);
+
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
@@ -192,12 +230,6 @@ const MonitorBilling = () => {
     };
   }, [isSidebarOpen]);
 
-  useEffect(() => {
-    const results = billingData.filter((bill) =>
-      bill.patientName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(results);
-  }, [searchTerm, billingData]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -215,6 +247,7 @@ const MonitorBilling = () => {
     navigate("/billing/monitor-billing/editInvoice");
   }
 
+ 
   const renderTable = () => (
     <div className="table-responsive">
       <table className="table monitor_billing-table table-hover">
@@ -233,32 +266,20 @@ const MonitorBilling = () => {
         <tbody>
           {filteredData.map((bill, index) => (
             <tr key={index}>
-              <td>
-                <div className="monitor_billing-time">{bill.billNumber}</div>
-              </td>
-              <td>{bill.patientName}</td>
-              <td>{bill.diseaseName}</td>
+              <td>{bill.BillNumber}</td>
+              <td>{bill.disease_name}</td>
+              <td>{bill.phoneNumber}</td>
               <td>{bill.phoneNumber}</td>
               <td>
-                <span
-                  className={`badge ${
-                    bill.status === "Paid" ? "bg-success" : "bg-danger"
-                  }`}
-                >
+                <span className={`badge ${bill.status === "Paid" ? "bg-success" : "bg-danger"}`}>
                   {bill.status}
                 </span>
               </td>
               <td>{bill.date}</td>
-              <td>
-                <div className="monitor_billing-time">{bill.time}</div>
-              </td>
+              <td>{bill.time}</td>
               <td>
                 <button className="bg-transparent" onClick={handleInvoice}>
-                  <img
-                    src="/assets/images/view-icon-box.svg"
-                    alt="view-icon-box"
-                    className="img-fluid"
-                  />
+                  <img src="/assets/images/view-icon-box.svg" alt="view-icon-box" className="img-fluid" />
                 </button>
               </td>
             </tr>
@@ -533,7 +554,7 @@ const MonitorBilling = () => {
           </div>
           <div className="row">
             <div className="col-12">
-              {filteredData.length > 0 ? renderTable() : renderNoDataFound()}
+             {filteredData.length > 0 ? renderTable() : renderNoDataFound()}
             </div>
           </div>
         </div>
