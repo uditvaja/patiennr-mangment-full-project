@@ -52,7 +52,7 @@ const PatientManagement = () => {
       if (todayResponse.data.appointments && todayResponse.data.appointments.length > 0) {
         const todayAppointments = todayResponse.data.appointments.map(appointment => ({
           id: appointment._id,
-          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          // patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
           patientIssue: appointment.patient_issue,
           doctorName: appointment.doctorId.firstName,
           diseaseName: appointment.diseas_name,
@@ -93,7 +93,7 @@ const PatientManagement = () => {
       if (upcomingResponse.data.appointments && upcomingResponse.data.appointments.length > 0) {
         const upcomingAppointments = upcomingResponse.data.appointments.map(appointment => ({
           id: appointment._id,
-          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          // patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
           patientIssue: appointment.patient_issue,
           doctorName: appointment.doctorId.firstName,
           diseaseName: appointment.diseas_name,
@@ -134,7 +134,7 @@ const PatientManagement = () => {
       if (previousResponse.data.appointments && previousResponse.data.appointments.length > 0) {
         const previousAppointments = previousResponse.data.appointments.map(appointment => ({
           id: appointment._id,
-          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          // patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
           patientIssue: appointment.patient_issue,
           doctorName: appointment.doctorId.firstName,
           diseaseName: appointment.diseas_name,
@@ -175,7 +175,7 @@ const PatientManagement = () => {
       if (canceledResponse.data.appointments && canceledResponse.data.appointments.length > 0) {
         const canceledAppointments = canceledResponse.data.appointments.map(appointment => ({
           id: appointment._id,
-          patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
+          // patientName: `${appointment.patientId.first_name} ${appointment.patientId.last_name}`,
           patientIssue: appointment.patient_issue,
           doctorName: appointment.doctorId.firstName,
           diseaseName: appointment.diseas_name,

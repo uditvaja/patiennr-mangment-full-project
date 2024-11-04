@@ -12,6 +12,7 @@ import {
 import "./Dashboard.scss";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import PatientsSummary from "../../../components/PatientsSummary/PatientsSummary";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -52,6 +53,8 @@ const Dashboard = () => {
   ]);
 
   const noNotificationImage = "/assets/images/no-notification.png";
+
+  const navigate = useNavigate();
 
   const clearNotifications = () => {
     setNotifications([]); // Clear the notifications array
@@ -139,6 +142,10 @@ const Dashboard = () => {
         return yearData;
     }
   };
+
+  const handleCreateBill = () => {
+    navigate("/billing/monitor-billing/createBill");
+  }
 
   const doctorAppointments = [
     {
@@ -541,7 +548,7 @@ const Dashboard = () => {
                     <div className="col-xl-5 mt-lg-0 mt-4">
                       <div className="d-flex align-items-center justify-content-between mb-4">
                         <h3 className="billing-title">Billing & Payments</h3>
-                        <button className="create-btn">
+                        <button className="create-btn" onClick={handleCreateBill}>
                           <img
                             src="./assets/images/add.svg"
                             alt="add"

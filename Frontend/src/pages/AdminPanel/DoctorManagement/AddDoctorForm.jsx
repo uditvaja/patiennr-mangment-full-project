@@ -112,13 +112,8 @@ const AddDoctorForm = () => {
     };
   }, [isSidebarOpen]);
 
-<<<<<<< HEAD
-  const handlePhotoUpload = (event) => {
-    setProfilePhoto(event.currentTarget.files[0]);
-=======
   const handlePhotoUpload = (e) => {
     setProfilePhoto(e.target.files[0]);
->>>>>>> 9c084402b2a665a584eac3580d0c1296bcaa4f2c
   };
 
   const handleSignatureUpload = (event) => {
