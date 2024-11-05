@@ -147,6 +147,10 @@ const Dashboard = () => {
     navigate("/billing/monitor-billing/createBill");
   }
 
+  const handleTodayAppList = () => {
+    navigate("/patient-management")
+  }
+
   const doctorAppointments = [
     {
       icon: "Avatar.png",
@@ -654,7 +658,7 @@ const Dashboard = () => {
                         <h5 className="billing-title">
                           Today's Appointments List
                         </h5>
-                        <button className="view-btn" type="button">
+                        <button className="view-btn" type="button" onClick={handleTodayAppList}>
                           View All
                         </button>
                       </div>
