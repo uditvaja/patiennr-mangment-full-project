@@ -1,15 +1,15 @@
 const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { connectDB } = require("./src/db/dbconnection");
-const config = require("./src/config/config");
+const { connectDB } = require("../backend/db/dbConnection");
+const config = require("./config/config");
 const cors = require("cors");
-const routes = require("./src/routes/v1");
+const routes = require("./routes/v1");
 const path = require("path");
-const errorHandler = require("./src/helpers/error");
-const Chat = require('./src/models/chat.model');
+const errorHandler = require("./helpers/error");
+// const Chat = require('./models/chat.model');/
 const socketIO = require("socket.io");
-const chatController = require('./src/controllers/chats/chat.controller');
+// const chatController = require('./controllers/chats/chat.controller');
 
 const app = express();
 const server = http.createServer(app);
