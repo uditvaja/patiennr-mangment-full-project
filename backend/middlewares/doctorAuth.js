@@ -1,7 +1,7 @@
 
 const jwt = require("jsonwebtoken");
-const { queryErrorRelatedResponse } = require("../src/helpers/sendresponse");
-const Doctor = require("../src/models/doctor.model");
+const { queryErrorRelatedResponse } = require("../helpers/sendresponse");
+const Doctor = require("../models/doctor.model");
 
 module.exports = async function (req, res, next) {
   let token = req.header("Authorization");

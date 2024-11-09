@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 // const { singleFileUpload } = require("../../../../helpers/upload");
-const { dashboardController } = require("../../../../src/controllers");
+const { dashboardController } = require("../../../../controllers");
 const authenticAdmin = require("../../../../middlewares/adminAuth");
 
  

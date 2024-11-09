@@ -2,9 +2,9 @@
 /* ------------------------------- DEFINE AREA ------------------------------ */
 const express = require("express");
 const router = express.Router();
-const {  doctorAuthController, doctorOwnController, doctorTimeSlotController, doctorFlowAppointmentController } = require("../../../src/controllers");
+const {  doctorAuthController, doctorOwnController, doctorTimeSlotController, doctorFlowAppointmentController } = require("../../../controllers");
 const authenticDoctor = require("../../../middlewares/doctorAuth");
-const { singleFileUpload, multiDiffFileUpload } = require("../../../src/helpers/upload");
+const { singleFileUpload, multiDiffFileUpload } = require("../../../helpers/upload");
 const multer = require('multer');
 /* ------------------------------- DOCTOR AUTH ------------------------------ */
 

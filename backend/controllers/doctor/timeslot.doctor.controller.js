@@ -1,5 +1,6 @@
 const DocTimeSlot = require("../../models/timeslot.doctor.model");
 
+
 const createTimeSlot = async (req, res) => {
     try {
       const reqBody = req.body;

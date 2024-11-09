@@ -2,58 +2,58 @@
 /* ------------------------------- DEFINE AREA ------------------------------ */
 const express = require("express");
 const router = express.Router();
-const { authAdminController, adminController, doctorController } = require("../../../src/controllers");
+const { authAdminController, adminController, doctorController } = require("../../../controllers");
 const authenticAdmin = require("../../../middlewares/adminAuth");
-const { singleFileUpload, multiDiffFileUpload } = require("../../../src/helpers/upload");
+const { singleFileUpload, multiDiffFileUpload } = require("../../../helpers/upload");
 const multer = require('multer');
-const { adminAuthValidation } = require("../../../validations");
-const validate = require("../../../middlewares/validate");
+// const { adminAuthValidation } = require("../../../validations");
+// const validate = require("../../../middlewares/validate");
 /* ------------------------------- DOCTOR AUTH ------------------------------ */
 
 /* -------------------------- CREATE/SIGNUP DOCTOR ----------- */
-router.post("/create-admin", validate(adminAuthValidation.createAdminRegister), authAdminController.register);
+router.post("/create-admin", authAdminController.register);
 
 /* -------------------------- LOGIN DOCTOR ----------- */
 router.post("/admin-login", 
     // authenticAdmin,
  authAdminController.login);
 
-// /* -------------------------- FORGOT PASSWORD DOCTOR ----------- */
+/* -------------------------- FORGOT PASSWORD DOCTOR ----------- */
 router.post("/forgot-pass", authAdminController.forgotPass);
 
-// /* -------------------------- VERIFY OTP DOCTOR ----------- */
+/* -------------------------- VERIFY OTP DOCTOR ----------- */
 router.post("/verify-otp", authAdminController.verifyOtp);
 
-// /* -------------------------- RESET PASSWORD DOCTOR ----------- */
+/* -------------------------- RESET PASSWORD DOCTOR ----------- */
 router.put("/reset-password", authAdminController.resetPassword);
 
-// /* -------------------------- CHANGE PASSWORD DOCTOR ----------- */
+/* -------------------------- CHANGE PASSWORD DOCTOR ----------- */
 router.post("/change-password", authenticAdmin, authAdminController.changePassword);
 
 // /* -------------------------- UPDATE DOCTOR PROFILE DOCTOR ----------- */
 // router.put(
 //   "/update-admin-profile",
-//   accessToken(),
+//   authenticAdmin,
 //   singleFileUpload("/adminImg", "image"),
 //   adminController.updateAdminProfile
 // );
 
-router.put(
-  '/update-admin-profile',
-  authenticAdmin, // Middleware to authenticate the admin using access token
-  singleFileUpload('/adminImg', 'image'), // Middleware to handle image upload (folder name and field name for the file)
-  adminController.updateAdminProfile // Controller function to handle the request
-);
-// router.post(
-  //   "/add-docor-by-admin",
-  //   // accessToken(),
-//   multiDiffFileUpload("/doctorImg", [
-//     { name: "signatureImage", maxCount: 1, allowedMimes: ["image/png", "image/jpeg", "image/jpg"] },
-//     { name: "image", maxCount: 1, allowedMimes: ["image/png", "image/jpeg", "image/jpg"] },
-//   ]),
-//   // singleFileUpload("/doctorImg", "signatureImage"),
-//   doctorController.addDoctorByAdmin
+// router.put(
+//   '/update-admin-profile',
+//   authenticAdmin, // Middleware to authenticate the admin using access token
+//   singleFileUpload('/adminImg', 'image'), // Middleware to handle image upload (folder name and field name for the file)
+//   adminController.updateAdminProfile // Controller function to handle the request
 // );
+router.post(
+    "/add-docor-by-admin",
+    // accessToken(),
+  multiDiffFileUpload("/doctorImg", [
+    { name: "signatureImage", maxCount: 1, allowedMimes: ["image/png", "image/jpeg", "image/jpg"] },
+    { name: "image", maxCount: 1, allowedMimes: ["image/png", "image/jpeg", "image/jpg"] },
+  ]),
+  // singleFileUpload("/doctorImg", "signatureImage"),
+  doctorController.addDoctorByAdmin
+);
 
 const uploadMiddleware = multiDiffFileUpload("/doctorImg", [
   {

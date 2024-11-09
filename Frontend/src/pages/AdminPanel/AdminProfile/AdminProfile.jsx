@@ -211,6 +211,7 @@ const AdminProfile = () => {
     document.addEventListener("mousedown", handleClickOutside);
 
     const storedData = localStorage.getItem("user");
+    console.log("storedData", storedData);
     if (storedData) {
       const data = JSON.parse(storedData);
       setProfileData({

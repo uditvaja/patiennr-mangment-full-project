@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
-const { queryErrorRelatedResponse } = require("../src/helpers/sendresponse");
-const Patient = require("../src/models/patient.model");
+const { queryErrorRelatedResponse } = require("../helpers/sendresponse");
+const Patient = require("../models/patient.model");
 
 
 module.exports = async function (req, res, next) {

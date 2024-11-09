@@ -5,9 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // const { singleFileUpload } = require("../../../../helpers/upload");
-const {  telecommunicationController } = require("../../../src/controllers");
-
-
+const {  telecommunicationController } = require("../../../controllers");
 
 /* -------------------------- CREATE/SIGNUP DOCTOR ----------- */
 router.get("/telecom-today-appointment", telecommunicationController.getTodayAppointments);

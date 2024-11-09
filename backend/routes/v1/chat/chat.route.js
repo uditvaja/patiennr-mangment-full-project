@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const ChatController = require('../../../src/controllers/chats/chat.controller');
+const ChatController = require('../../../controllers/chats/chat.controller');
 const multer = require('multer');
 const authenticDoctor = require("../../../middlewares/doctorAuth");
-const { singleFileUpload,singleFileUploadPdf } = require('../../../src/helpers/upload');
+const { singleFileUpload,singleFileUploadPdf } = require('../../../helpers/upload');
 
 // Fetch all messages
 router.post('/get-all', ChatController.saveMessage);

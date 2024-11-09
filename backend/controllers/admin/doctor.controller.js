@@ -127,7 +127,7 @@ const Doctor = require("../../models/doctor.model");
 
 
 
-const cloudinary = require('../../../config/cloudinaryConfig'); // Adjust the path as needed
+const cloudinary = require('../../config/cloudinaryConfig'); // Adjust the path as needed
 const deletefile = require("../../helpers/deletefile");
 
 const addDoctorByAdmin = async (req, res) => {

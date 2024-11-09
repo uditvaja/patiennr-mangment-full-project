@@ -20,7 +20,7 @@ const createBill = async (req, res) => {
     const bill = new Bill(reqBody);
     
     // Save the bill instance
-    await bill.save();
+    await bill.save();  
 
     res.status(200).json({
       status: 200,

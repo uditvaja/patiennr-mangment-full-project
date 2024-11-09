@@ -9,8 +9,4 @@ const { singleFileUpload, multiDiffFileUpload } = require("../../../helpers/uplo
 router.get("/search-doctor-and-patient-list",
     authenticAdmin, 
     dashboardController.searchDoctorAndPatientist);
-
-
-
-
 module.exports = router;

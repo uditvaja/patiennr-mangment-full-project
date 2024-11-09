@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 // const { singleFileUpload } = require("../../../../helpers/upload");
-const { patintFlowBookappointmentController } = require("../../../src/controllers");
+const { patintFlowBookappointmentController } = require("../../../controllers");
 const authenticPatient = require("../../../middlewares/patientAuth");
 
 

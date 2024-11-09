@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const getTodayAppointments = async (req, res) => {
     try {
               // Get doctorId from request
-              const { doctorId } = req.body;
+              const { doctorId } = req.parms;
 
               // Validate doctorId
               if (!doctorId) {
@@ -62,7 +62,7 @@ const getUpcomingAppointments = async (req, res) => {
     try {
 
           // Get doctorId from request
-          const { doctorId } = req.body;
+          const { doctorId } = req.parms;
 
           // Validate doctorId
           if (!doctorId) {
@@ -115,7 +115,7 @@ const getPreviousAppointments = async (req, res) => {
     try {
 
           // Get doctorId from request
-          const { doctorId } = req.body;
+          const { doctorId } = req.parms;
 
           // Validate doctorId
           if (!doctorId) {
@@ -164,7 +164,7 @@ const getCanceledAppointments = async (req, res) => {
     try {
 
           // Get doctorId from request
-          const { doctorId } = req.body;
+          const { doctorId } = req.parms;
 
           // Validate doctorId
           if (!doctorId) {
@@ -472,7 +472,7 @@ const createAppointmentNote = async (req, res) => {
 // pateint record access in doctor flow
 const getDetailsPatients = async (req, res) => {
     try {
-        const { doctorId } = req.body; // Get doctorId from the request body
+        const { doctorId } = req.params; // Corrected to req.params
 
         // Validate doctorId
         if (!doctorId) {
@@ -536,11 +536,15 @@ const getDetailsPatients = async (req, res) => {
     }
 };
 
+// Ensure the doctorId is passed as a query or route parameter
+
+
+
 // patient record access in searching result month week day waise in doctor flow
 
 const getDetailsPatientsSearching = async (req, res) => {
         try {
-            const { doctorId, periodType } = req.body; // Get doctorId and periodType from the request body
+            const { doctorId, periodType } = req.parms; // Get doctorId and periodType from the request body
     
             // Validate doctorId
             if (!doctorId) {
@@ -626,7 +630,7 @@ const getDetailsPatientsSearching = async (req, res) => {
 
 const patientDetailFromDoctorIdInDoctorFlowAppointments = async (req, res) => {
     try {
-        const { doctorId, patientId } = req.body; // Extract doctorId and patientId from req.body
+        const { doctorId, patientId } = req.parms; // Extract doctorId and patientId from req.body
 
         if (!doctorId || !patientId) {
             return res.status(400).json({ message: 'Both doctorId and patientId are required in the request body.' });
@@ -665,7 +669,7 @@ const patientDetailFromDoctorIdInDoctorFlowAppointments = async (req, res) => {
 
 const getAppointmentsByDoctor = async (req, res) => {
     try {
-        const { patientId } = req.body; // Extract patientId from req.body
+        const { patientId } = req.parms; // Extract patientId from req.body
 
         if (!patientId) {
             return res.status(400).json({ message: 'patientId is required in the request body.' });

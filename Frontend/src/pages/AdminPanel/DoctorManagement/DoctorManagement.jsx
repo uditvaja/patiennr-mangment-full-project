@@ -343,7 +343,7 @@ const DoctorManagement = () => {
                         <Dropdown.Item href="#/settings">
                           Settings
                         </Dropdown.Item>
-                        <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
+                        <Dropdown.Item href="/login">Logout</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                   </div>

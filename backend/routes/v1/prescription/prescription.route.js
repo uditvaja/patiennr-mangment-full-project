@@ -4,8 +4,8 @@ const express = require("express");
 const router = express.Router();
 
 // const { singleFileUpload } = require("../../../../helpers/upload");
-const {   prescriptionController, precriptionPatientController, uploadFileOfPrescriptionController } = require("../../../src/controllers");
-const { singleFileUpload } = require("../../../src/helpers/upload");
+const {   prescriptionController, precriptionPatientController, uploadFileOfPrescriptionController } = require("../../../controllers");
+const { singleFileUpload } = require("../../../helpers/upload");
 
 
 // ----------------------------------------START-----------------------------------------------------------------------------------

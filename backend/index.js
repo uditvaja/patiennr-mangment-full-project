@@ -1,7 +1,7 @@
 const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { connectDB } = require("../backend/db/dbConnection");
+const { connectDB } = require("./db/dbConnection");
 const config = require("./config/config");
 const cors = require("cors");
 const routes = require("./routes/v1");

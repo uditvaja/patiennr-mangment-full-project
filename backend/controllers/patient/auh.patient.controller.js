@@ -2,7 +2,7 @@
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
-
+const mongoose = require('mongoose');
 // const { Admin } = require("../../models/admin.model");
 const ejs = require("ejs");
 const path = require("path");
@@ -434,6 +434,55 @@ const resetPassword = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+
+const getPatientById = async (req, res) => {
+  try {
+    const { patientId } = req.body; // Retrieve patientId from the request body
+
+    // Validate if patientId is provided
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient ID is required",
+      });
+    }
+
+    // Check if patientId is a valid ObjectId if using MongoDB
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid patient ID format",
+      });
+    }
+
+    // Find the patient by ID
+    const patient = await Patient.findById(patientId);
+
+    // Check if patient exists
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    // Respond with the patient data
+    res.status(200).json({
+      success: true,
+      message: "Patient retrieved successfully",
+      data: patient,
+    });
+  } catch (error) {
+    console.error("Error fetching patient:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
 // /* ----------------------------- CHANGE PASSWORD ---------------------------- */
 const changePassword = async (req, res) => {
   try {
@@ -492,5 +541,6 @@ module.exports = {
   verifyOtp,
   resetPassword,
   changePassword,
-  getAllPatients
+  getAllPatients,
+  getPatientById
 };
